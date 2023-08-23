@@ -29,7 +29,7 @@ t.start <- Sys.time()
 print(t.start)
 
 suppressMessages(suppressWarnings(library(rgdal)))
-suppressMessages(suppressWarnings(library(raster)))
+suppressMessages(suppressWarnings(library(terra)))
 
 sessionInfo()
 
@@ -54,6 +54,8 @@ nat$band1 <- nat$band1 + sec$band1
 
 rm(sec)
 gc()
+
+nat <- rast(nat)
 
 nat <- raster(nat)
 
