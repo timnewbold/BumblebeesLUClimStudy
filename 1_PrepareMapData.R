@@ -1,3 +1,5 @@
+#### Setup ####
+
 dataDir <- "0_data/"
 fertilizerDataDir <- "0_data/FertilizerCropSpecific_Geotiff/"
 outDir <- "1_PrepareMapData/"
@@ -20,55 +22,73 @@ outDir <- "1_PrepareMapData/"
 ## to an integer value, with the resulting raster files saved as:
 ## 'pri_1km_int' and 'sec_1km_int'
 
+# Create output directory, if it doesn't already exist
 if(!dir.exists(outDir)) dir.create(outDir)
 
+# Create log file
 sink(paste0(outDir,"log.txt"))
 
+# Start timer
 t.start <- Sys.time()
 
 print(t.start)
 
+# Load required packages
 suppressMessages(suppressWarnings(library(rgdal)))
-suppressMessages(suppressWarnings(library(terra)))
+suppressMessages(suppressWarnings(library(raster)))
 
+# Print session information to log file
 sessionInfo()
 
+#### Natural Habitat Map ####
+
+# Define Behrmann equal-area projection
 behrCRS <- CRS('+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 +datum=WGS84 +ellps=WGS84 +units=m +no_defs')
 
 cat('% natural habitat\n')
 
+# Read map of primary habitat
 pri <- readGDAL(paste(
   dataDir,"pri_1km_int",sep=""),
   silent = TRUE)
 
+# Create natural-habitat map, initially containing coverage of primary habitats
 nat <- pri
 
+# Clean-up
 rm(pri)
 gc()
 
+# Read map of secondary habitat
 sec <- readGDAL(paste(
   dataDir,"sec_1km_int",sep=""),
   silent = TRUE)
 
+# Sum primary and secondary habitat as natural habitat
 nat$band1 <- nat$band1 + sec$band1
 
 rm(sec)
 gc()
 
-nat <- rast(nat)
-
+# Convert to raster
 nat <- raster(nat)
 
-nat <- projectRaster(from = nat,res = 1000,crs = behrCRS)
+# Project natural habitat map to Behrmann equal-area projection
+nat <- raster::projectRaster(from = nat,res = 1000,crs = behrCRS)
 
+# Round back to integer values
 values(nat) <- round(values(nat))
 
+# Create raster to depict 5-km blocks
 toRas <- nat
 
+# Define longitudinal steps to create 5-km blocks
 step <- ncol(nat)/5
 
+# Define number of blocks in the latitudinal direction
 nBlocks <- ceiling(nrow(nat)/5)
 
+# Create raster values depicting the identity of 5-km blocks
 cat('Splitting map\n')
 
 for (block in 1:nBlocks){
@@ -90,20 +110,27 @@ for (block in 1:nBlocks){
   }
 }
 
+# Assign block identity values to raster map
 values(toRas) <- blockVals
 
+# Summarize natural habitat values in 1-km map by 5-km blocks
 cat('Calculating values\n')
 
 zm <- zonal(nat,toRas)
 
+# Create a new 5-km-resolution raster to hold summarized natural-habitat values
 e <- extent(nat)
-e@ymin <- e@ymin-1000
+e[3] <- e[3]-1000
 
 newRas <- raster(nrows=nBlocks,ncols=step,ext=e,crs=behrCRS)
+
+# Assign summarized natural-habitat values to new 5-km raster
 values(newRas) <- zm[,2]
 
+# Write final raster to file
 writeRaster(x = newRas,filename = paste(outDir,"PercentNatural.tif",sep=""),format="GTiff")
 
+# Clean-up
 rm(newRas,blockVals,nat,zm)
 gc()
 
@@ -194,16 +221,22 @@ gc()
 # 
 # writeRaster(x = newRas,filename = paste(outDir,"HabitatDiversity.tif",sep=""),format="GTiff")
 
+#### Fertilizer Map ####
+
+# List directories containing estimates of fertilizer application for 17 crops
 cropDirs <- dir(path = fertilizerDataDir,pattern = "Fertilizer_",full.names = TRUE)
 
+# Loop over directories for each crop, summing resulting fertilizer maps
 total.application <- sum(stack(lapply(cropDirs,function(cd){
   
-  cat(paste0(gsub("FertilizerCropSpecific_Geotiff/Fertilizer_","",cd),"\n"))
+  cat(paste0(gsub("0_data/FertilizerCropSpecific_Geotiff/Fertilizer_","",cd),"\n"))
   
+  # List files that contain N, P and K fertilizer application rates for the crop
   dataFiles <- dir(path = cd,pattern = "_Total.tif",full.names = TRUE)
   dataFiles <- dataFiles[!(grepl("aux",dataFiles))]
   dataFiles <- dataFiles[!(grepl("ovr",dataFiles))]
   
+  # Loop over the files for N, P and K fertilizer
   fert.application <- sum(stack(lapply(dataFiles,function(f){
     
     appl <- raster(f)
@@ -217,6 +250,8 @@ total.application <- sum(stack(lapply(cropDirs,function(cd){
 })),na.rm=TRUE)
 
 writeRaster(x = total.application,filename = paste0(outDir,"FertilizerMap.tif"),format="GTiff")
+
+
 
 t.end <- Sys.time()
 
