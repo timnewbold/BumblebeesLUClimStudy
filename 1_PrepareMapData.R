@@ -2,17 +2,14 @@
 
 dataDir <- "0_data/"
 fertilizerDataDir <- "0_data/FertilizerCropSpecific_Geotiff/"
+pesticideDataDir <- "0_data/PEST-CHEMGRIDS_v1_01_APR/GEOTIFF/"
 outDir <- "1_PrepareMapData/"
 
 ################################################################################
 ########################## OBTAINING DATA ######################################
 ################################################################################
 
-## FERTILIZERS
-## Global data on density of application (kg/ha) of nitrogen, phosphorous and 
-## potassium fertilizer on 17 major crops can be downloaded here:
-## http://www.earthstat.org/nutrient-application-major-crops/
-## The downloaded data are contained in a folder 'FertilizerCropSpecific_Geotiff'
+## All the data below need to be saved in a folder called '0_data'
 
 ## COVERAGE OF NATURAL HABITAT
 ## Data on the coverage of natural (primary and secondary) habitats can be
@@ -21,6 +18,20 @@ outDir <- "1_PrepareMapData/"
 ## These data then need to be pre-processed by multiplying by 1000 and converting
 ## to an integer value, with the resulting raster files saved as:
 ## 'pri_1km_int' and 'sec_1km_int'
+
+## FERTILIZERS
+## Global data on the density of application (kg/ha) of nitrogen, phosphorous and 
+## potassium fertilizer on 17 major crops can be downloaded here:
+## http://www.earthstat.org/nutrient-application-major-crops/
+## The downloaded data need to be in a folder 'FertilizerCropSpecific_Geotiff'
+
+## PESTICIDES
+## Global data on the density of application (kg/ha) of different types of pesticides
+## on different agricultural crops can be downloaded (in GeoTIFF format) here:
+## https://sedac.ciesin.columbia.edu/data/set/ferman-v1-pest-chemgrids-v1-01/data-download
+## The downloaded data need to be in the following directory structure:
+## 'PEST-CHEMGRIDS_v1_01_APR/GEOTIFF'
+
 
 # Create output directory, if it doesn't already exist
 if(!dir.exists(outDir)) dir.create(outDir)
@@ -134,93 +145,6 @@ writeRaster(x = newRas,filename = paste(outDir,"PercentNatural.tif",sep=""),form
 rm(newRas,blockVals,nat,zm)
 gc()
 
-#### PROBABLY NOT NEEDED - CHECK!
-
-# cat('Habitat diversity\n')
-# 
-# clc.files <- dir(paste(dataDir,"consensuslandcover",sep=""))
-# 
-# clc.map <- raster(paste(dataDir,"consensuslandcover/consensus_full_class_1.tif",sep=""))
-# clc.map <- projectRaster(from = clc.map,res = 1000,crs = behrCRS)
-# values(clc.map) <- round(values(clc.map))
-# 
-# toRas <- clc.map
-# 
-# step <- ncol(clc.map)/5
-# 
-# nBlocks <- ceiling(nrow(clc.map)/5)
-# 
-# cat('Splitting map\n')
-# 
-# for (block in 1:nBlocks){
-#   
-#   print(block)
-#   
-#   blockStart <- ((block-1) * step) + 1
-#   
-#   inds <- rep(blockStart:(blockStart+step - 1),each=5)
-#   
-#   if (block != nBlocks){
-#     inds <- rep(inds,5)
-#   } else {
-#     inds <- rep(inds,1)
-#   }
-#   
-#   if(block==1){
-#     blockVals <- inds
-#   } else {
-#     blockVals <- c(blockVals,inds)
-#   }
-# }
-# 
-# values(toRas) <- blockVals
-# 
-# rm(blockVals,clc.map,inds)
-# gc()
-# 
-# clc.vals <- array(data = NA,dim = c(12,25,18671963))
-# 
-# cat('Processing land-cover data\n')
-# 
-# for(i in 1:length(clc.files)){
-#   
-#   cat('Processing map',i,'\n')
-#   
-#   map <- raster(paste(dataDir,"consensuslandcover/",clc.files[i],sep=""))
-#   
-#   map <- projectRaster(from = map,res = 1000,crs = behrCRS)
-#   
-#   values(map) <- round(values(map))
-#   
-#   vals <- do.call('cbind',split(values(map),values(toRas)))
-#   
-#   clc.vals[i,,] <- vals
-#   
-#   rm(vals)
-#   
-#   gc()
-# }
-# 
-# e <- extent(toRas)
-# e@ymin <- e@ymin-4000
-# 
-# newRas <- raster(nrows=nBlocks,ncols=step,ext=e,crs=behrCRS)
-# 
-# cat('Calculating values\n')
-# 
-# values(newRas) <- apply(X = clc.vals,MARGIN = 3,FUN = function(x){
-#   
-#   x <- x/100
-#   
-#   y <- apply(X = x,MARGIN = 1,FUN = mean,na.rm = TRUE)
-#   
-#   si <- -sum(y[y>0] * log(y[y>0]))
-#   
-#   return(si)
-# })
-# 
-# writeRaster(x = newRas,filename = paste(outDir,"HabitatDiversity.tif",sep=""),format="GTiff")
-
 #### Fertilizer Map ####
 
 # List directories containing estimates of fertilizer application for 17 crops
@@ -251,7 +175,44 @@ total.application <- sum(stack(lapply(cropDirs,function(cd){
 
 writeRaster(x = total.application,filename = paste0(outDir,"FertilizerMap.tif"),format="GTiff")
 
+#### Pesticide Map ####
 
+# List all files in the directory of pesticide application maps for the year 2015
+pest.files <- list.files(pesticideDataDir, pattern = "2015")
+
+# Separate out the files for the low and high estimates of application densities
+pest.files_H <- pest.files[grep(pest.files, pattern = "2015_H")]
+pest.files_L <- pest.files[grep(pest.files, pattern = "2015_L")]
+
+# Stack the rasters for the high estimates
+pest_H <- stack(paste0(pesticideDataDir, "/", pest.files_H))
+
+# Reclassify the various no-data values as NA:
+# -2 = Water; -1.5 = No data; -1 = Banned or not approved substances
+pest_H <- reclassify(pest_H, matrix(
+  data = c(-2, -1.5, -1, NA, NA, NA), byrow = F, ncol = 2), right = F)
+
+# Sum high estimates of pesticide application across all substances and all crops
+pest_H_total <- calc(x = pest_H, fun = sum, na.rm = TRUE)
+
+# Output the final map for high estimates of total pesticide application rate
+writeRaster(pest_H_total, filename = paste0(outdir, "/Pesticide_totalAPR_High.tif"))
+
+# Stack the rasters for the low estimates
+pest_L <- stack(paste0(pesticideDataDir, "/", pest.files_L))
+
+# Reclassify the various no-data values as NA:
+# -2 = Water; -1.5 = No data; -1 = Banned or not approved substances
+pest_L <- reclassify(pest_L, matrix(
+  data = c(-2, -1.5, -1, NA, NA, NA), byrow = F, ncol = 2), right = F)
+
+# Sum low estimates of pesticide application across all substances and all crops
+pest_L_total <- calc(x = pest_L, fun = sum, na.rm = TRUE)
+
+# Output the final map for low estimates of total pesticide application rate
+writeRaster(pest_L_total, filename = paste0(outdir, "/Pesticide_totalAPR_Low.tif"))
+
+#### Finish ####
 
 t.end <- Sys.time()
 
