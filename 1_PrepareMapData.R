@@ -1,5 +1,6 @@
 #### Setup ####
 
+# Set input and output directories
 dataDir <- "0_data/"
 fertilizerDataDir <- "0_data/FertilizerCropSpecific_Geotiff/"
 pesticideDataDir <- "0_data/PEST-CHEMGRIDS_v1_01_APR/GEOTIFF/"
@@ -196,7 +197,7 @@ pest_H <- reclassify(pest_H, matrix(
 pest_H_total <- calc(x = pest_H, fun = sum, na.rm = TRUE)
 
 # Output the final map for high estimates of total pesticide application rate
-writeRaster(pest_H_total, filename = paste0(outdir, "/Pesticide_totalAPR_High.tif"))
+writeRaster(pest_H_total, filename = paste0(outDir, "/Pesticide_totalAPR_High.tif"))
 
 # Stack the rasters for the low estimates
 pest_L <- stack(paste0(pesticideDataDir, "/", pest.files_L))
@@ -210,7 +211,7 @@ pest_L <- reclassify(pest_L, matrix(
 pest_L_total <- calc(x = pest_L, fun = sum, na.rm = TRUE)
 
 # Output the final map for low estimates of total pesticide application rate
-writeRaster(pest_L_total, filename = paste0(outdir, "/Pesticide_totalAPR_Low.tif"))
+writeRaster(pest_L_total, filename = paste0(outDir, "/Pesticide_totalAPR_Low.tif"))
 
 #### Finish ####
 
