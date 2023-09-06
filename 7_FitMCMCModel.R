@@ -3,8 +3,9 @@
 # Set input and output directories
 dataDir <- "2_PrepareDiversityData/"
 modelsDir <- "3_RunModels/"
+bestModelDir <- "6_RefitBestModel/"
 
-outDir <- "6_RefitBestModel/"
+outDir <- "7_FitMCMCModel/"
 
 # Create output directory, if it doesn't already exist
 if(!dir.exists(outDir)) dir.create(outDir)
@@ -19,6 +20,7 @@ print(t.start)
 
 # Load required packages
 suppressMessages(suppressWarnings(library(StatisticalModels)))
+suppressMessages(suppressWarnings(library(MCMCglmm)))
 
 # Print session information
 sessionInfo()
@@ -56,13 +58,19 @@ modelData <- na.omit(modelData)
 # Load the final model
 finalModels <- readRDS(paste(modelsDir,"FinalModels.rds",sep=""))
 
-bestModel <- GLMER(modelData = modelData,responseVar = "occur",
-                   fitFamily = "binomial",
-                   fixedStruct = "LandUse+poly(NaturalHabitat,2)+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(AgeConv,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-                   randomStruct = "(1|SS)+(1|SSBS)+(1|Taxon_name_entered)",
-                   saveVars = c("Longitude","Latitude"))
+# Load the best model refitted using the GLMER function
+bestModel <- readRDS(paste0(bestModelDir,"BestModel.Rds"))
 
-saveRDS(object = bestModel,file = paste0(outDir,"BestModel.Rds"))
+# Fit an MCMC model with the same structure as the best-fitting model
+mcmcModel <- MCMCglmm(fixed = occur~LandUse+poly(NaturalHabitat,2)+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(AgeConv,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1),random = ~SS+SSBS+Taxon_name_entered,data = modelData,family = "categorical",pr=TRUE)
+
+saveRDS(object = mcmcModel,file = paste0(outDir,"MCMCModel.Rds"))
+
+mcmcPreds <- predict.MCMCglmm(object = mcmcModel,newdata = NULL,verbose=TRUE,marginal = NULL)
+
+predsCompare <- data.frame(predsLM4=fitted(bestModel$model),predsMCMC=mcmcPreds)
+
+saveRDS(object = predsCompare,file = paste0(outDir,"MCMCLME4PredictionsCompared.Rds"))
 
 # End timer
 t.end <- Sys.time()
