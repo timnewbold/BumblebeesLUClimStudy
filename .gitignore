@@ -1,2 +1,13 @@
 0_data
 1_PrepareMapData
+2_PrepareDiversityData
+3_RunModels
+4_PlotModelResults
+5_GetEstimatedBiodiversityChanges
+6_RefitBestModel
+7_FitMCMCModel
+10_RunBestModelWithHighPesticide
+8_Manuscript.docx
+9_SupplementaryMaterial.docx
+.Rhistory
+Rplots.pdf
