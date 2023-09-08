@@ -1,0 +1,182 @@
+---
+title: Supplementary Material for 'Bumblebee occupancy responds to complex interactions between local and landscape land use, climatic niche properties and climate change'
+author: "Tim Newbold^1,\\*^, Jeremy Kerr^2^, Peter Soroye^2,&dagger;^, Jessica J. Williams^1^"
+output:
+  bookdown::word_document2:
+    toc: false
+    fig_caption: TRUE
+    number_sections: no
+always_allow_html: true
+csl: science-advances.csl
+bibliography: bumblebees_lu_cc_refs.bib
+---
+
+^1^Centre for Biodiversity and Environment Research, Department of Genetics, Evolution and Environment, University College London, London, UK
+
+^2^Department of Biology, University of Ottawa, Ottawa, Ontario, Canada
+
+^&dagger;^Current address: Wildlife Conservation Society Canada, Toronto, Ontario, Canada
+
+^\*^Correspondence: [t.newbold@ucl.ac.uk](mailto:t.newbold@ucl.ac.uk)
+
+<!-- SETUP: Global options -->
+```{r,echo=FALSE,results=FALSE}
+knitr::opts_chunk$set
+options(scipen=20)
+set.seed(1234)
+```
+
+# Model Diagnostic Checks
+
+<br />    
+
+<!-- SETUP: read data and models -->
+```{r,echo=FALSE,results=FALSE,warning=FALSE}
+# Set input directories
+dataDir <- "2_PrepareDiversityData/"
+modelsDir <- "3_RunModels/"
+bestModelDir <- "6_RefitBestModel/"
+mcmcModelDir <- "7_FitMCMCModel/"
+
+# Load the compiled species-level data
+diversity <- readRDS(paste0(dataDir,"diversity_data.rds"))
+
+allData <- readRDS(paste0(modelsDir,"ModelData.Rds"))
+
+sites <- readRDS(paste0(modelsDir,"AnalysisSites.rds"))
+
+# Set input directory
+inDir <- "3_RunModels/"
+
+# Load required packages
+suppressMessages(suppressWarnings(library(StatisticalModels)))
+
+# Log-transform elevation, which is very skewed
+diversity$LogElevation <- log(diversity$Elevation+2)
+
+# Log-transform fertilizer application, which is also very skewed
+diversity$LogFertilizer <- log(diversity$Fertilizer+1)
+
+diversity$UI <- paste(diversity$LandUse,diversity$Use_intensity,sep="_")
+diversity$UI[grepl("Natural",diversity$UI)] <- "Natural"
+diversity$UI[grepl("NA",diversity$UI)] <- NA
+diversity$UI[grepl("Cannot decide",diversity$UI)] <- NA
+diversity$UI <- factor(diversity$UI)
+diversity$UI <- relevel(diversity$UI,ref="Natural")
+
+# Select relevant columns
+modelData <- diversity[,c('occur','LandUse','TEI_BL',
+                          'TEI_delta','LogElevation','SS','SSBS',
+                          'Taxon_name_entered','Longitude','Latitude',
+                          'Best_guess_binomial','Country',
+                          'Pesticide','LogFertilizer',
+                          'NaturalHabitat','AgeConv')]
+# Remove rows with any NA values
+modelData <- na.omit(modelData)
+
+# Load the final model
+finalModels <- readRDS(paste(inDir,"FinalModels.rds",sep=""))
+
+bestModel <- readRDS(paste0(bestModelDir,"BestModel.Rds"))
+```
+
+<!-- PLOTTING: model diagnostic checks -->
+```{r diagnostic,echo=FALSE,results=FALSE,warning=FALSE, fig.width=8.5, fig.height=8,out.width="50%", fig.cap="**Q-Q plot of scaled model residuals compared to the expected distribution of residuals**. This plot was produced directly from the DHARMa R package Version 0.4.6"}
+suppressMessages(suppressWarnings(library(DHARMa)))
+suppressMessages(suppressWarnings(library(StatisticalModels)))
+
+simResids <- simulateResiduals(finalModels[[17]])
+
+par(cex=2)
+par(cex.axis=1.3)
+par(cex.lab=1.3)
+par(cex.text=1.3)
+par(las=1)
+par(tck=-0.01)
+par(mgp=c(2.2,0.2,0))
+par(mar=c(3.4,3.4,0.2,0.2))
+
+DHARMa::plotQQunif(simResids,main=NA)
+box(bty="l")
+
+```
+
+<br />
+
+```{r lme4mcmc,echo=FALSE,results=FALSE,warning=FALSE, fig.width=8.5, fig.height=7,out.width="50%", fig.cap="**Comparison of fitted values from the main best-fitting model and a model with identical structure fitted using MCMC**. This comparison was made to check for robustness of model-estimated probabailities of presence, given the violation of the assumptions of standard parametric statistical tests, shown in Figure S1. The MCMC model was fit using the MCMCglmm R package Version 2.34"}
+predsCompared <- readRDS(file = paste0(mcmcModelDir,"MCMCLME4PredictionsCompared.Rds"))
+
+par(las=1)
+par(tck=-0.01)
+par(mgp=c(1.8,0.2,0))
+par(mar=c(2.8,2.8,0.2,0.2))
+par(cex=2)
+par(cex.axis=1.3)
+par(cex.lab=1.3)
+par(cex.text=1.3)
+plot(predsCompared$predsLM4,predsCompared$predsMCMC,pch=16,cex=0.2,xlab="Original Fitted Values",ylab="MCMC Fitted Values")
+abline(0,1,col="#ff0000",lwd=2)
+
+```
+
+<br /> 
+
+```{r spatautocorrel,echo=FALSE,results=FALSE,warning=FALSE, fig.width=8.5, fig.height=7,out.width="50%", fig.cap="**Distribution of P values from a series of Moran's tests for spatial autocorrelation in the residuals associated with each individual study**. For each study, we calculated the average residual for each sampled site, and then ran a Moran's test for spatial autocorrelation in these average residuals. Moran's tests were performed using the spdep R package Version 1.2-8"}
+
+bestModel$data <- droplevels(bestModel$data)
+
+siteAvgResids <- data.frame(resids=tapply(X = residuals(bestModel$model),
+                                          INDEX = bestModel$data$SSBS,
+                                          FUN = mean))
+siteAvgResids$SSBS <- row.names(siteAvgResids)
+row.names(siteAvgResids) <- NULL
+siteAvgResids$Longitude <- bestModel$data$Longitude[
+  match(siteAvgResids$SSBS,bestModel$data$SSBS)]
+siteAvgResids$Latitude <- bestModel$data$Latitude[
+  match(siteAvgResids$SSBS,bestModel$data$SSBS)]
+siteAvgResids$SS <- bestModel$data$SS[
+  match(siteAvgResids$SSBS,bestModel$data$SSBS)]
+
+moran <- as.data.frame(t(sapply(X = as.character(unique(siteAvgResids$SS)),FUN = function(ss){
+  
+  data.sub <- droplevels(siteAvgResids[siteAvgResids$SS==ss,])
+  
+  ds.nb<-try(dnearneigh(cbind(data.sub$Longitude,data.sub$Latitude),
+                            d1=0.00000001,d2=10),silent=TRUE)
+  ds.listw<-try(nb2listw(ds.nb),silent=TRUE)
+  mt<-tryCatch(moran.test(data.sub$resids,ds.listw),silent=TRUE,error=function(e) e,
+               warning=function(w) w)
+  
+  if(class(mt)[1]=="htest"){
+        if ((!is.na(mt$statistic))){
+          return(data.frame(SS=ss,i=mt$statistic,p=mt$p.value))
+        } else {
+          return(data.frame(SS=ss,i=NA,p=NA))
+        }
+    
+  } else {
+    return(data.frame(SS=ss,i=NA,p=NA))
+  }
+  
+})))
+
+moran$SS <- as.character(moran$SS)
+moran$i <- as.numeric(moran$i)
+moran$p <- as.numeric(moran$p)
+
+par(las=1)
+par(tck=-0.01)
+par(mgp=c(1.8,0.2,0))
+par(mar=c(2.8,2.8,0.2,0.2))
+par(cex=2)
+par(cex.axis=1.3)
+par(cex.lab=1.3)
+par(cex.text=1.3)
+hist(x = moran$p,breaks = seq(from=0,to=1,by=0.05),main=NA,xlab="Moran's Test P Value")
+box(bty="l")
+abline(v=0.05,col="#ff0000",lwd=3)
+
+text(x=0.07,y=8,labels=paste0("Significant \nspatial \nautocorrelation \nin ",round(length(which(moran$p<0.05))/length(which(!is.na(moran$p)))*100,1),"% \nof studies"),
+     pos=4)
+
+```
