@@ -42,18 +42,26 @@
 ## Estimates of the realized climatic niches of bumblebees, and how these have
 ## changed under recent climate change can be downloaded from the dedicated
 ## Figshare repository for this paper:
-## INSERT LINK
+## DOI: 10.6084/m9.figshare.24081441
 ## The creation of these estimates is described in Soroye et al. (2020), DOI: 
 ## 10.1126/science.aax8591
+## The files need are named:
+## bombus_stacknames.txt
+## BaselineTEI_Spp.rds
+## BaselinePEI_Spp.rds
+## DeltaTEI_Spp_Period3.rds
+## DeltaPEI_Spp_Period3.rds
 
 ## LAND-USE HISTORY
 ## Data on the year in which landscapes were first 30% converted to human land
 ## uses is also available in the dedicated Figshare repository for this paper:
-## INSERT LINK
+## DOI: 10.6084/m9.figshare.24081441
 ## For more information on these estimates, see Newbold et al. (2015), DOI:
 ## 10.1038/nature14324
+## The file needed is named yocPS15002005_1_0.3.asc
 
 ## UN SUB-REGIONS MAP
 ## A map of UN sub-regions, for plottingpurposes, can be downladed from the
 ## dedicated Figshare repository for this paper:
-## INSERT LINK
+## DOI: 10.6084/m9.figshare.24081441
+## The files needed are the 6 shapefile files named UN_subregion
