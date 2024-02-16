@@ -7,7 +7,7 @@ output:
     fig_caption: TRUE
     number_sections: no
 always_allow_html: true
-csl: science-advances.csl
+csl: ecology-letters.csl
 bibliography: bumblebees_lu_cc_refs.bib
 ---
 
@@ -17,9 +17,25 @@ bibliography: bumblebees_lu_cc_refs.bib
 
 ^&dagger;^Current address: Wildlife Conservation Society Canada, Toronto, Ontario, Canada
 
-^\*^Correspondence: [t.newbold@ucl.ac.uk](mailto:t.newbold@ucl.ac.uk)
+^\*^Correspondence: Tim Newbold, Centre for Biodiversity & Environment Research, Department of Genetics, Evolution & Environment, University College London, Gower Street, London WC1E 6BT, United Kingdom; Email: [t.newbold@ucl.ac.uk](mailto:t.newbold@ucl.ac.uk); Tel: +44(0)2031087569
 
 **Short title:** Land-use-climate interactions and bumblebees
+
+**Keywords:** Bumblebees, Climate change, Fertilizer, Land use, Natural habitat, Occupancy, Pesticide, Pressure interactions, Thermal niche
+
+**Type of article:** Letter
+
+**Authorship statement:** TN, JK, PS and JJW designed the analyses. TN performed all main analyses. TN and PS provided the methods for quantifying species' thermal niche position. TN wrote the first draft of the manuscript. All authors contributed to editing the manuscript. TN and JK secured the funding to support the presented research.
+
+**Number of words in abstract:** 150
+
+**Number of words in main text (excluding abstract, acknowledgments, references, and table and figure legends):** 5,436
+
+**Number of references:** 80
+
+**Number of figures:** 6
+
+**Number of tables:** 1
 
 <!-- SETUP: Global options -->
 ```{r setup,echo=FALSE,results=FALSE}
@@ -27,11 +43,13 @@ knitr::opts_chunk$set
 options(scipen=20)
 ```
 
+\newpage
+
 # Abstract
 
-Insect biodiversity is changing rapidly, driven by a complex suite of pressures, foremost among which are human land use, land-use intensification, and increasingly climate change. Bumblebees deliver important pollination services to wild plants and human crops, but we lack large-scale empirical evidence on how land use and climate change interact to drive bumblebee biodiversity changes. We assess bumblebee occupancy responses to interactive effects of land use and climate pressures across North America and Western Europe. Occupancy increases with landscape natural habitat and decreases with the duration of human use of landscapes. Responses to historical climate warming are negative in natural habitats but positive in human land uses, while human land use reduces occupancy most in the centre of species’ temperature niches. We estimate that the combined pressures have reduced bumblebee occupancy by 61% across sampled natural habitats, and 65% across human land uses, suggesting that treating present-day natural habitats as an undisturbed reference is misleading. Our results can inform efforts to conserve bumblebee biodiversity in the face of ongoing land-use changes and accelerating climatic changes.
+Insect biodiversity is changing rapidly, driven by a complex suite of pressures, notably land use, land-use intensification, and increasingly climate change. Bumblebees pollinate wild plants and crops, but we lack large-scale evidence on how land use and climate change interact to drive bumblebee biodiversity changes. We assess bumblebee responses to interactive effects of land use and climate pressures across North America and Western Europe. Occupancy increases with landscape natural habitat and in landscapes more recently disturbed by humans. Responses to historical climate warming are negative in natural habitats but positive in human land uses, while human land use reduces occupancy most in the centre of species’ temperature niches. We estimate that the combined pressures have reduced bumblebee occupancy by 61% across sampled natural habitats, and 65% across human land uses. Our results can inform efforts to conserve bumblebee biodiversity in the face of ongoing land-use changes and accelerating climatic changes.
 
-**One-sentence summary:** Land use and climate change interact to drive large declines in bumblebee occupancy in both natural and human-modified habitats
+\newpage
 
 # Introduction
 
@@ -47,7 +65,11 @@ Recent evidence points toward synergistic interactive effects of land use, land-
 
 Bumblebees are a key group of species, of high importance for both natural ecosystems and agricultural production. Half of plant species are estimated to depend on wild animal pollinators for more than 80% of their seed production [@Rodger2021]. Lower pollinator biodiversity has been shown to reduce the reproductive success of wild plants [@Albrecht2012], and greater rates of declines of plants that depend on animal pollination than other plant species may be associated with declines in key pollinator species [@Biesmeijer2006]. Many studies have shown positive relationships between pollinator diversity and measures of crop success [@Woodcock2019; @Garibaldi2013; @Dainese2019; @Klein2003; @Lemanski2022]. As 'buzz' pollinators [@Pritchard2020], which use vibrations to dislodge pollen from flowers and play a vital role in the pollination of certain plant species, bumblebees make a substantial contribution to the pollination of many important crops, including apples, pears, melons, peppers, cucumbers, tomatoes, and many nuts and soft fruits [@Klein2007].
 
-Here we present a continental-scale study that simultaneously considers the interacting effects of climate change, land use and land-use intensification on bumblebee species' occupancy. Despite there being numerous studies on the impact of individual pressures on bees, bumblebees and other insects, continental-scale studies remain rare, which has prevented the identification of general patterns in bee responses to interacting large-scale pressures. We study the impact of land-use-climate interactions on bumblebees across the continents of North America and Europe (although the available data were biased towards Europe). Specifically, we test the response of bumblebee occupancy to five classes of environmental variables: land use (natural habitat versus agricultural areas), land-use intensity (application rates of pesticides and fertilizer), land-use history, landscape natural habitat availability, and climate-related variables (population position within species' realized temperature niche, and change in this niche position caused by recent climate change). We hypothesize that bumblebee occupancy will be lower in agricultural areas, particularly where land-use intensity is higher, where landscapes have been dominated by human activities for longer, and where less natural habitat remains within the landscape. We further hypothesize that occupancy will be most strongly reduced in agricultural land use for populations near the upper limit of species' temperature niche, and especially where there have been recent increases in temperature. We test these hypotheses using mixed-effects models that fit bumblebee occupancy at sites across North America and Western Europe as a function of variables describing land use, land-use intensity and climatic niche properties, using data from the PREDICTS database [@Hudson2014; @Hudson2017]. We include random effects to control for variation among the individual studies collated within the PREDICTS database, as well as random variation in occupancy among sites and species. Because the PREDICTS database contains snapshot spatial comparisons of biodiversity among different habitats, mostly sampled between 2000 and 2013, biodiversity may already have been reduced within natural habitats as a result of historic human pressures (leading to a 'shifting baseline syndrome' [@Pauly1995]). To test for such impacts, we use our models, which describe responses to multiple interacting pressures, to infer how bumblebee occupancy has been altered across sampled habitats, both natural and human-modified.
+Here we present a continental-scale study that simultaneously considers the interacting effects of climate change, land use and land-use intensification on bumblebee species' occupancy. Despite there being numerous studies on the impact of individual pressures on bees, bumblebees and other insects, continental-scale studies remain rare, and there have been no large-scale studies assessing bumblebee responses to interacting effects of climate and land-use-related pressures. We study the impact of land-use-climate interactions on bumblebees across the continents of North America and Europe. Specifically, we test the response of bumblebee occupancy to five classes of environmental variables: land use (natural habitat versus agricultural areas), land-use intensity (application rates of pesticides and fertilizer), land-use history, landscape natural habitat availability, and climate-related variables (population position within species' realized temperature niche, and change in this niche position caused by recent climate change). We hypothesize that bumblebee occupancy will be lower in agricultural areas, particularly where land-use intensity is higher, where landscapes have been dominated by human activities for longer, and where less natural habitat remains within the landscape. We further hypothesize that occupancy will be most strongly reduced in agricultural land use for populations near the upper limit of species' temperature niche, and especially where there have been recent increases in temperature. Because the analysed data consist of snapshot spatial comparisons of biodiversity among different habitats, mostly sampled between 2000 and 2013, biodiversity may already have been reduced within natural habitats as a result of historic human pressures (leading to a 'shifting baseline syndrome' [@Pauly1995]). To test for such impacts, we use our models, which describe responses to multiple interacting pressures, to infer how bumblebee occupancy has been altered across sampled habitats, both natural and human-modified.
+
+# Material and Methods
+
+## Data on Responses to Land Use
 
 <!-- SUMMARY STATISTICS: data summaries -->
 ```{r summarize_data,echo=FALSE,warning=FALSE,results=FALSE}
@@ -90,6 +112,66 @@ diversity$SampleYearMid <- as.integer(
 first.year <- min(diversity$SampleYearMid)
 last.year <- max(diversity$SampleYearMid)
 ```
+
+Data describing the occurrence of bumblebees in different land-use types were derived from the PREDICTS database [@Hudson2017]. The PREDICTS database collates biodiversity records from individual studies that conducted snapshot spatial samples of biodiversity along land-use or land-use-intensity gradients [@Hudson2014]. Studies included in the database had to meet a number of criteria: 1) that the study, or at least its methods, were published; 2) that biodiversity was sampled at more than one location; 3) that the study considered the effect of human activities on a set of sampled taxa, with the level of human activity varying among sampled locations; and 4) that the sampling protocol was the same across sampled sites. Any records without geographical coordinates were omitted. In this study, we focused on the occurrence (i.e., simple presence or absence) of taxa that were identified to the species level.  
+
+The final dataset that we used in this study were derived from `r n.studies` original studies, and consist of `r n.records` records for `r n.species` bumblebee species, collected across `r n.sites` sites in `r n.countries` different countries in North America, and Western, Northern and Southern Europe: `r na.omit(countries2)` (Figure \@ref(fig:figsitesmap)). The original samples of bumblebees that were collated in the PREDICTS database were collected in the field between `r first.year` and `r last.year`.
+
+<!-- PLOTTING: Plot map of sites included in analysis -->
+```{r figsitesmap, echo=FALSE, warning=FALSE, fig.width=17, fig.height=12, out.width="100%", fig.cap="**Location of sites used in the analysis**. Base map shows the UN sub-regions from which bumblebee data were obtained: Northern America, Central America, Northern Europe, Western Europe and Southern Europe. Note that Mexico is classed within Central America in the UN sub-region scheme. Map is plotted with geographical coordinates using the WGS 1984 datum"}
+
+par(cex=2)
+
+suppressMessages(suppressWarnings(library(rgdal)))
+
+dataDir <- "0_data/"
+
+# Make map of sites
+occMap <- SpatialPointsDataFrame(coords = data.frame(x=sites$Longitude,
+                                                     y=sites$Latitude),
+                                 data = sites,
+                                 proj4string = CRS(
+                                   "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+
+# Read map of UN sub-regions, and select relevant regions (Europe and N America)
+un_sub <- readOGR(dsn = gsub("/","",dataDir),layer = "UN_subregion",verbose = FALSE)
+
+un_sub <- un_sub[(un_sub$SUBREGION %in% c(21,13,154,155,39)),]
+
+# Define plotting colours for UN sub-regions
+cols <- colorRampPalette(colors = c("#000000","#ffffff"))(5)
+
+par(mar=c(0,0,0,0))
+
+plot(un_sub,col=cols,xlim=c(-180,30))
+
+plot(occMap,add=TRUE,pch=16,cex=0.5,col="#cc0000")
+
+```
+
+## Explanatory Variables
+
+We considered land use in our analysis by dividing sampled sites into either natural habitats or human-modified land. In the PREDICTS database, land use is classified into one of six broad categories: primary vegetation (natural habitat never having been recorded as being destroyed), secondary vegetation (habitat recovering to its natural state after being destroyed in the past by human actions or extreme natural events), plantation forests (areas used to cultivate woody crops), cropland (areas used to cultivate herbaceous crops, including as fodder for livestock), pasture (areas used regularly or permanently to graze livestock), and urban (areas of human settlement or other buildings, or areas managed for human recreation). We treated primary and secondary vegetation as natural habitats, and all other land-use types as human-modified.
+
+We investigated how variables describing surrounding habitat conditions, land-use intensity (specifically, chemical application) and species' temperature niche properties shape the occupancy of bumblebees in both natural and human-modified habitats.
+
+Information on habitat condition in the landscapes surrounding sampled sites comprised estimates of the availability of natural habitat, as well as the length of time that landscape habitat has been substantially modified by humans. Availability of surrounding natural habitats was measured as the percentage of natural habitat in the 5 &times; 5-km grid cell within which the biodiversity sample was taken. Original mapped estimates of different land-use types were from a down-scaled land-use projection for 2005 (the mid-point of original field sampling of data included in this analysis; see previous sub-section) at 30-arc-second spatial resolution (approximately 1 km at the Equator) [@Hoskins2016]. These land-use maps estimate the fraction of each grid cell covered by five out of the six land-use types recognised in the PREDICTS database: primary and secondary vegetation, cropland, pasture and urban. Following our classification of overall land-use type (see above), we summed the primary and secondary vegetation maps to obtain estimates of natural habitat. We projected and resampled this map of the fractional cover of natural habitat at 30-arc-second resolution to an equal-area grid (Behrmann projection) at 1-km resolution, using bilinear interpolation (implemented using the projectRaster function of the raster R package Version 3.5-29; [@Hijmans2021]). We then aggregated the resulting 1-km map by a factor of five, calculating the mean fractional cover of natural habitat for each 25-cell spatial cluster, yielding the final map at 5-km resolution. We derived estimates of the duration of substantial human habitat modification from a land-use reconstruction at 0.5° spatial resolution. Specifically, we used the reconstruction from the harmonized land-use estimates created for the fifth assessment report of the Intergovernmental Panel on Climate Change [@Hurtt2011]. The original historical land-use estimates used in this harmonization were from the HYDE model Version 3.1 [@Goldewijk2011]. The harmonized historical land-use estimates describe reconstructed changes in the fractional cover of primary vegetation, secondary vegetation, croplands, pastures and urban areas from 1500 to 2005. We measured the duration of substantial human habitat modification as the number of years since a 0.5° grid cell was first 30% converted to human-modified land-use types (croplands, pastures or urban areas). Grid cells that have never yet reached the conversion threshold of 30% are considered to have a duration of substantial landscape modification of 0 years. A 30% loss of natural habitats from landscapes is a level above which the most sensitive species are thought to be substantially negatively impacted [@Andren1994].
+
+We considered the density (kg/ha) of application of two classes of chemicals: pesticides and fertilisers. We derived recent modelled estimates of pesticide application density across a 5-arc-minutes (approximately 10 km at the Equator) global spatial grid [@Maggi2019]. We used the low rather than high modelled estimates from this dataset, to be conservative, but tested the robustness of our models to using the high estimates instead. We obtained estimates of fertiliser application rates from global modelled estimates, also at 5-arc-minutes spatial resolution [@Mueller2012]. Estimates are available of total nitrogen, phosphorous and potassium application rates on each of 17 major global crops. We summed application rates for all three nutrients and all 17 crops to generate an estimate of total fertiliser application rate. 
+
+For information on species temperature niche properties, we used previously published methods and associated records of bumblebee occupancy [@Soroye2020]. Specifically, we estimated: 1) the exposure of a species' population to extreme high temperatures relative to its realized temperature niche in a baseline period before the onset of rapid climate changes (1901 &mdash; 1975); and 2) the change in exposure caused by climate change between the baseline period and a more recent period (2000 &mdash; 2014). Realized temperature niche limits were estimated for each species as the mean of the five lowest minimum monthly temperatures and the maximum of the five highest maximum monthly temperatures across all bumblebee spatial records in the baseline period. To measure the exposure of each species' population to extreme high temperatures in either the baseline or recent period, we then derived the maximum monthly temperatures for all twelve months in each baseline or recent year. These maximum monthly temperatures were rescaled such that a value of 0 equates to the minimum realized temperature niche limit of the species, and a value of 1 to the maximum niche limit. We then averaged the 12 monthly values to derive an annual mean exposure. Finally, we averaged the annual exposure estimates across all years in either the baseline or recent period. Thus, we were able to estimate, for any biodiversity record, the average exposure to extreme high temperatures in the baseline period, or the change in exposure between the baseline and recent periods. Monthly minimum and maximum temperature estimates for the period 1901 to 2015 were obtained from the CRU global gridded climate reconstruction Version 3.24.01 [@CRU32401], which was the most recent version of this dataset available at the time the bumblebee climatic niche properties were estimated.
+
+## Statistical Analysis
+
+To analyse the presence or absence of bumblebee species at the sampled locations, we used binomial generalised linear mixed-effects models, to account for the hierarchical structure of the PREDICTS database. In all models, we used a binary response variable representing the presence or absence of each species at each sampled location. Species were considered absent if they were not recorded but had been targeted by a particular study (typically these species were sampled in at least one of the sites within each study). As random effects, we fitted: 1) Study identity, to control for differences in sampling protocols and broad geographic differences; 2) Site identity nested within study identity, to control for site-specific factors; and 3) Species identity, to account for variation in responses among species unrelated to variation in the environmental driver variables. Although there may be important differences between the two continents in average occupancy of bumblebees, as well as in responses to the considered explanatory variables, the size of the dataset and the fact that sampling was much less intensive in North America than Europe prevented the inclusion of such variation in the models.
+
+We considered a candidate set of models with different fixed-effects structures. First, we fitted a null, intercept-only model. Second, a model with only land use as a fixed effect. Third, models fitting, as well as land use, all possible combinations of the different broad classes of explanatory variables (landscape habitat, land-use intensity, and climatic niche properties), and also interactions between these additional explanatory variables and land use (Table \@ref(tab:tablestats)). We assessed model fit to the data using AIC values. For each model $i$ in the set of models $I$, we calculated the difference in its AIC compared to the best-fitting model, $\Delta_i$, and the model AIC weight, $AIC_w$: 
+
+$$AIC_w=\frac{e^{-\frac{1}{2}\Delta_i}}{\sum_{i=1}^{I}{(e^{-\frac{1}{2}\Delta_i})}}$$
+
+We also calculated the sum of AIC weights of all models containing a particular class of explanatory variable. In addition to comparing the statistical support for models by comparing AIC values and AIC weights, we also estimated model explanatory power by computing pseudo R^2^ values following [@Nakagawa2013], conducted model diagnostic tests using the DHARMa package Version 0.4.5 in R [@DHARMa], and tested for spatial autocorrelation in the residuals associated with each underlying study using Moran's test, implemented in the spdep package Version 1.2-8.
+
+To reveal the impacts that environmental changes to date have had on bumblebee biodiversity across both natural habitats and human-modified habitats, we used our final set of models to infer biodiversity changes across the sampled sites, based on the values of the model explanatory variables at those sites at the time of biodiversity sampling (or as close as possible - see above). These estimates thus included the impacts on both natural and modified habitats of climate change, and the modification of landscapes by human land use. Estimates of biodiversity at the time of sampling were expressed as a percentage difference compared to a baseline condition in which we assumed that landscapes were entirely composed of natural habitat, thus with no history of human modification, subject to no application of fertilizers and pesticides, and with no change in climate experienced. To derive model-estimated differences between baseline and contemporary conditions, we randomly generated 1,000 estimates of percentage difference to represent both model and parameter uncertainty. Thus, each estimate was generated by: 1) drawing at random from among the candidate models, weighted by their AIC weights (see above); 2) drawing a set of parameters from this chosen model based on a multivariate normal distribution, with means being the model-estimated coefficients, the standard deviation from the coefficient uncertainties, and parameter correlations derived from the variance-covariance matrix; 3) using these parameters to estimate average bumblebee probability of occurrence under baseline and contemporary environmental conditions; and 4) calculating the percentage difference in average occurrence probability between baseline and contemporary conditions.
 
 # Results
 
@@ -1320,108 +1402,18 @@ Understanding changes in biodiversity through time using a spatial database of s
 
 In conclusion, we show that interactions between climate change and land use drive rapid and substantial changes in bumblebee biodiversity across both natural habitats and human-modified land. Given the importance of bumblebees for pollinating wild plants [@Ollerton2017] and agricultural crops (notably apples, pears, melons, peppers, cucumbers, tomatoes, and many nuts and soft fruits [@Klein2007]), these changes are likely to have important effects on both natural ecosystems and on our ability to grow food. Mitigating further losses of bumblebee diversity, and potentially reversing past declines, will require strong mitigation of climate change combined with restoration of natural habitats. To predict future changes in biodiversity, including of bumblebees, we must account for the complex interaction of climate and land-use pressures that are currently affecting species.
 
-# Materials and Methods
-
-## Data on Responses to Land Use
-
-Data describing the occurrence of bumblebees in different land-use types were derived from the PREDICTS database [@Hudson2017]. The PREDICTS database collates biodiversity records from individual studies that conducted snapshot spatial samples of biodiversity along land-use or land-use-intensity gradients [@Hudson2014]. Studies included in the database had to meet a number of criteria: 1) that the study, or at least its methods, were published; 2) that biodiversity was sampled at more than one location; 3) that the study considered the effect of human activities on a set of sampled taxa, with the level of human activity varying among sampled locations; and 4) that the sampling protocol was the same across sampled sites. Any records without geographical coordinates were omitted. In this study, we focused on the occurrence (i.e., simple presence or absence) of taxa that were identified to the species level.  
-
-The final dataset that we used in this study were derived from `r n.studies` original studies, and consist of `r n.records` records for `r n.species` bumblebee species, collected across `r n.sites` sites in `r n.countries` different countries in North America, and Western, Northern and Southern Europe: `r na.omit(countries2)` (Figure \@ref(fig:figsitesmap)). The original samples of bumblebees that were collated in the PREDICTS database were collected in the field between `r first.year` and `r last.year`.
-
-<!-- PLOTTING: Plot map of sites included in analysis -->
-```{r figsitesmap, echo=FALSE, warning=FALSE, fig.width=17, fig.height=12, out.width="100%", fig.cap="**Location of sites used in the analysis**. Base map shows the UN sub-regions from which bumblebee data were obtained: Northern America, Central America, Northern Europe, Western Europe and Southern Europe. Note that Mexico is classed within Central America in the UN sub-region scheme. Map is plotted with geographical coordinates using the WGS 1984 datum"}
-
-par(cex=2)
-
-suppressMessages(suppressWarnings(library(rgdal)))
-
-dataDir <- "0_data/"
-
-# Make map of sites
-occMap <- SpatialPointsDataFrame(coords = data.frame(x=sites$Longitude,
-                                                     y=sites$Latitude),
-                                 data = sites,
-                                 proj4string = CRS(
-                                   "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-
-# Read map of UN sub-regions, and select relevant regions (Europe and N America)
-un_sub <- readOGR(dsn = gsub("/","",dataDir),layer = "UN_subregion",verbose = FALSE)
-
-un_sub <- un_sub[(un_sub$SUBREGION %in% c(21,13,154,155,39)),]
-
-# Define plotting colours for UN sub-regions
-cols <- colorRampPalette(colors = c("#000000","#ffffff"))(5)
-
-par(mar=c(0,0,0,0))
-
-plot(un_sub,col=cols,xlim=c(-180,30))
-
-plot(occMap,add=TRUE,pch=16,cex=0.5,col="#cc0000")
-
-```
-
-## Explanatory Variables
-
-We considered land use in our analysis by dividing sampled sites into either natural habitats or human-modified land. In the PREDICTS database, land use is classified into one of six broad categories: primary vegetation (natural habitat never having been recorded as being destroyed), secondary vegetation (habitat recovering to its natural state after being destroyed in the past by human actions or extreme natural events), plantation forests (areas used to cultivate woody crops), cropland (areas used to cultivate herbaceous crops, including as fodder for livestock), pasture (areas used regularly or permanently to graze livestock), and urban (areas of human settlement or other buildings, or areas managed for human recreation). We treated primary and secondary vegetation as natural habitats, and all other land-use types as human-modified.
-
-We investigated how variables describing surrounding habitat conditions, land-use intensity (specifically, chemical application) and species' temperature niche properties shape the occupancy of bumblebees in both natural and human-modified habitats.
-
-Information on habitat condition in the landscapes surrounding sampled sites comprised estimates of the availability of natural habitat, as well as the length of time that landscape habitat has been substantially modified by humans. Availability of surrounding natural habitats was measured as the percentage of natural habitat in the 5 &times; 5-km grid cell within which the biodiversity sample was taken. Original mapped estimates of different land-use types were from a down-scaled land-use projection for 2005 (the mid-point of original field sampling of data included in this analysis; see previous sub-section) at 30-arc-second spatial resolution (approximately 1 km at the Equator) [@Hoskins2016]. These land-use maps estimate the fraction of each grid cell covered by five out of the six land-use types recognised in the PREDICTS database: primary and secondary vegetation, cropland, pasture and urban. Following our classification of overall land-use type (see above), we summed the primary and secondary vegetation maps to obtain estimates of natural habitat. We projected and resampled this map of the fractional cover of natural habitat at 30-arc-second resolution to an equal-area grid (Behrmann projection) at 1-km resolution, using bilinear interpolation (implemented using the projectRaster function of the raster R package Version 3.5-29; [@Hijmans2021]). We then aggregated the resulting 1-km map by a factor of five, calculating the mean fractional cover of natural habitat for each 25-cell spatial cluster, yielding the final map at 5-km resolution. We derived estimates of the duration of substantial human habitat modification from a land-use reconstruction at 0.5° spatial resolution. Specifically, we used the reconstruction from the harmonized land-use estimates created for the fifth assessment report of the Intergovernmental Panel on Climate Change [@Hurtt2011]. The original historical land-use estimates used in this harmonization were from the HYDE model Version 3.1 [@Goldewijk2011]. The harmonized historical land-use estimates describe reconstructed changes in the fractional cover of primary vegetation, secondary vegetation, croplands, pastures and urban areas from 1500 to 2005. We measured the duration of substantial human habitat modification as the number of years since a 0.5° grid cell was first 30% converted to human-modified land-use types (croplands, pastures or urban areas). Grid cells that have never yet reached the conversion threshold of 30% are considered to have a duration of substantial landscape modification of 0 years. A 30% loss of natural habitats from landscapes is a level above which the most sensitive species are thought to be substantially negatively impacted [@Andren1994].
-
-We considered the density (kg/ha) of application of two classes of chemicals: pesticides and fertilisers. We derived recent modelled estimates of pesticide application density across a 5-arc-minutes (approximately 10 km at the Equator) global spatial grid [@Maggi2019]. We used the low rather than high modelled estimates from this dataset, to be conservative, but tested the robustness of our models to using the high estimates instead. We obtained estimates of fertiliser application rates from global modelled estimates, also at 5-arc-minutes spatial resolution [@Mueller2012]. Estimates are available of total nitrogen, phosphorous and potassium application rates on each of 17 major global crops. We summed application rates for all three nutrients and all 17 crops to generate an estimate of total fertiliser application rate. 
-
-For information on species temperature niche properties, we used previously published methods and associated records of bumblebee occupancy [@Soroye2020]. Specifically, we estimated: 1) the exposure of a species' population to extreme high temperatures relative to its realized temperature niche in a baseline period before the onset of rapid climate changes (1901 &mdash; 1975); and 2) the change in exposure caused by climate change between the baseline period and a more recent period (2000 &mdash; 2014). Realized temperature niche limits were estimated for each species as the mean of the five lowest minimum monthly temperatures and the maximum of the five highest maximum monthly temperatures across all bumblebee spatial records in the baseline period. To measure the exposure of each species' population to extreme high temperatures in either the baseline or recent period, we then derived the maximum monthly temperatures for all twelve months in each baseline or recent year. These maximum monthly temperatures were rescaled such that a value of 0 equates to the minimum realized temperature niche limit of the species, and a value of 1 to the maximum niche limit. We then averaged the 12 monthly values to derive an annual mean exposure. Finally, we averaged the annual exposure estimates across all years in either the baseline or recent period. Thus, we were able to estimate, for any biodiversity record, the average exposure to extreme high temperatures in the baseline period, or the change in exposure between the baseline and recent periods. Monthly minimum and maximum temperature estimates for the period 1901 to 2015 were obtained from the CRU global gridded climate reconstruction Version 3.24.01 [@CRU32401], which was the most recent version of this dataset available at the time the bumblebee climatic niche properties were estimated.
-
-## Statistical Analysis
-
-To analyse the presence or absence of bumblebee species at the sampled locations, we used binomial generalised linear mixed-effects models, to account for the hierarchical structure of the PREDICTS database. In all models, we used a binary response variable representing the presence or absence of each species at each sampled location. Species were considered absent if they were not recorded but had been targeted by a particular study (typically these species were sampled in at least one of the sites within each study). As random effects, we fitted: 1) Study identity, to control for differences in sampling protocols and broad geographic differences; 2) Site identity nested within study identity, to control for site-specific factors; and 3) Species identity, to account for variation in responses among species unrelated to variation in the environmental driver variables. Although there may be important differences between the two continents in average occupancy of bumblebees, as well as in responses to the considered explanatory variables, the size of the dataset and the fact that sampling was much less intensive in North America than Europe prevented the inclusion of such variation in the models.
-
-We considered a candidate set of models with different fixed-effects structures. First, we fitted a null, intercept-only model. Second, a model with only land use as a fixed effect. Third, models fitting, as well as land use, all possible combinations of the different broad classes of explanatory variables (landscape habitat, land-use intensity, and climatic niche properties), and also interactions between these additional explanatory variables and land use (Table \@ref(tab:tablestats)). We assessed model fit to the data using AIC values. For each model $i$ in the set of models $I$, we calculated the difference in its AIC compared to the best-fitting model, $\Delta_i$, and the model AIC weight, $AIC_w$: 
-
-$$AIC_w=\frac{e^{-\frac{1}{2}\Delta_i}}{\sum_{i=1}^{I}{(e^{-\frac{1}{2}\Delta_i})}}$$
-
-We also calculated the sum of AIC weights of all models containing a particular class of explanatory variable. In addition to comparing the statistical support for models by comparing AIC values and AIC weights, we also estimated model explanatory power by computing pseudo R^2^ values following [@Nakagawa2013], conducted model diagnostic tests using the DHARMa package Version 0.4.5 in R [@DHARMa], and tested for spatial autocorrelation in the residuals associated with each underlying study using Moran's test, implemented in the spdep package Version 1.2-8.
-
-To reveal the impacts that environmental changes to date have had on bumblebee biodiversity across both natural habitats and human-modified habitats, we used our final set of models to infer biodiversity changes across the sampled sites, based on the values of the model explanatory variables at those sites at the time of biodiversity sampling (or as close as possible - see above). These estimates thus included the impacts on both natural and modified habitats of climate change, and the modification of landscapes by human land use. Estimates of biodiversity at the time of sampling were expressed as a percentage difference compared to a baseline condition in which we assumed that landscapes were entirely composed of natural habitat, thus with no history of human modification, subject to no application of fertilizers and pesticides, and with no change in climate experienced. To derive model-estimated differences between baseline and contemporary conditions, we randomly generated 1,000 estimates of percentage difference to represent both model and parameter uncertainty. Thus, each estimate was generated by: 1) drawing at random from among the candidate models, weighted by their AIC weights (see above); 2) drawing a set of parameters from this chosen model based on a multivariate normal distribution, with means being the model-estimated coefficients, the standard deviation from the coefficient uncertainties, and parameter correlations derived from the variance-covariance matrix; 3) using these parameters to estimate average bumblebee probability of occurrence under baseline and contemporary environmental conditions; and 4) calculating the percentage difference in average occurrence probability between baseline and contemporary conditions.
-
 <!--
 ```{r session_info, echo=FALSE,reulst=TRUE,eval=TRUE}
 print(sessionInfo())
 ```
 -->
 
-# Acknowledgments
-
-**Funding:**
-
-Royal Society International Exchanges grant to TN and JK (IE161031)
-
-UK Natural Environment Research Council grant to TN (NE/R010811/1)
-
-Royal Society University Research Fellowship to TN (UF150526)
-
-
-**Author Contributions:**
-
-Conceptualization: TN, JK, PS and JJW
-
-Formal analysis: TN
-
-Funding acquisition: TN and JK
-
-Methodology: TN, JK, PS and JJW
-
-Writing - original draft: TN
-
-Writing - review & editing: JK, PS and JJW
-
-
-**Competing Interests:**
-
-The authors declare no competing interests.
-
-**Data and Materials Availability:**
+# Data and Code Availability:
 
 Code to run the analyses is available on GitHub ([https://github.com/timnewbold/BumblebeesLUClimStudy](https://github.com/timnewbold/BumblebeesLUClimStudy)). Data are available on FigShare ([https://figshare.com/s/5e88f431142bc8fc454a](https://figshare.com/s/5e88f431142bc8fc454a)) - temporary link for peer review.
+
+# Acknowledgments
+
+This research was supported by a Royal Society International Exchanges grant to TN and JK (IE161031), UK Natural Environment Research Council grants to TN (NE/R010811/1 and NE/V006533/1) and a Royal Society University Research Fellowship to TN (UF150526). The authors declare no competing interests.
 
 # References

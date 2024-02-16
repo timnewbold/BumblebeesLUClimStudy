@@ -7,7 +7,7 @@ output:
     fig_caption: TRUE
     number_sections: no
 always_allow_html: true
-csl: science-advances.csl
+csl: ecology-letters.csl
 bibliography: bumblebees_lu_cc_refs.bib
 ---
 
