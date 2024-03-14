@@ -26,10 +26,6 @@ options(scipen=20)
 set.seed(1234)
 ```
 
-# Model Diagnostic Checks
-
-<br />    
-
 <!-- SETUP: read data and models -->
 ```{r,echo=FALSE,results=FALSE,warning=FALSE}
 # Set input directories
@@ -79,6 +75,46 @@ finalModels <- readRDS(paste(inDir,"FinalModels.rds",sep=""))
 
 bestModel <- readRDS(paste0(bestModelDir,"BestModel.Rds"))
 ```
+
+# Sites in Analysis
+
+<br />
+
+<!-- PLOTTING: Plot map of sites included in analysis -->
+```{r figsitesmap, echo=FALSE, warning=FALSE, fig.width=17, fig.height=12, out.width="100%", fig.cap="**Location of sites used in the analysis**. Base map shows the UN sub-regions from which bumblebee data were obtained: Northern America, Central America, Northern Europe, Western Europe and Southern Europe. Note that Mexico is classed within Central America in the UN sub-region scheme. Map is plotted with geographical coordinates using the WGS 1984 datum"}
+
+par(cex=2)
+
+suppressMessages(suppressWarnings(library(rgdal)))
+
+dataDir <- "0_data/"
+
+# Make map of sites
+occMap <- SpatialPointsDataFrame(coords = data.frame(x=sites$Longitude,
+                                                     y=sites$Latitude),
+                                 data = sites,
+                                 proj4string = CRS(
+                                   "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+
+# Read map of UN sub-regions, and select relevant regions (Europe and N America)
+un_sub <- readOGR(dsn = gsub("/","",dataDir),layer = "UN_subregion",verbose = FALSE)
+
+un_sub <- un_sub[(un_sub$SUBREGION %in% c(21,13,154,155,39)),]
+
+# Define plotting colours for UN sub-regions
+cols <- colorRampPalette(colors = c("#000000","#ffffff"))(5)
+
+par(mar=c(0,0,0,0))
+
+plot(un_sub,col=cols,xlim=c(-180,30))
+
+plot(occMap,add=TRUE,pch=16,cex=0.5,col="#cc0000")
+
+```
+
+# Model Diagnostic Checks
+
+<br />    
 
 <!-- PLOTTING: model diagnostic checks -->
 ```{r diagnostic,echo=FALSE,results=FALSE,warning=FALSE, fig.width=8.5, fig.height=8,out.width="50%", fig.cap="**Q-Q plot of scaled model residuals compared to the expected distribution of residuals**. This plot was produced directly from the DHARMa R package Version 0.4.6"}

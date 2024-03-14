@@ -115,39 +115,7 @@ last.year <- max(diversity$SampleYearMid)
 
 Data describing the occurrence of bumblebees in different land-use types were derived from the PREDICTS database [@Hudson2017]. The PREDICTS database collates biodiversity records from individual studies that conducted snapshot spatial samples of biodiversity along land-use or land-use-intensity gradients [@Hudson2014]. Studies included in the database had to meet a number of criteria: 1) that the study, or at least its methods, were published; 2) that biodiversity was sampled at more than one location; 3) that the study considered the effect of human activities on a set of sampled taxa, with the level of human activity varying among sampled locations; and 4) that the sampling protocol was the same across sampled sites. Any records without geographical coordinates were omitted. In this study, we focused on the occurrence (i.e., simple presence or absence) of taxa that were identified to the species level.  
 
-The final dataset that we used in this study were derived from `r n.studies` original studies, and consist of `r n.records` records for `r n.species` bumblebee species, collected across `r n.sites` sites in `r n.countries` different countries in North America, and Western, Northern and Southern Europe: `r na.omit(countries2)` (Figure \@ref(fig:figsitesmap)). The original samples of bumblebees that were collated in the PREDICTS database were collected in the field between `r first.year` and `r last.year`.
-
-<!-- PLOTTING: Plot map of sites included in analysis -->
-```{r figsitesmap, echo=FALSE, warning=FALSE, fig.width=17, fig.height=12, out.width="100%", fig.cap="**Location of sites used in the analysis**. Base map shows the UN sub-regions from which bumblebee data were obtained: Northern America, Central America, Northern Europe, Western Europe and Southern Europe. Note that Mexico is classed within Central America in the UN sub-region scheme. Map is plotted with geographical coordinates using the WGS 1984 datum"}
-
-par(cex=2)
-
-suppressMessages(suppressWarnings(library(rgdal)))
-
-dataDir <- "0_data/"
-
-# Make map of sites
-occMap <- SpatialPointsDataFrame(coords = data.frame(x=sites$Longitude,
-                                                     y=sites$Latitude),
-                                 data = sites,
-                                 proj4string = CRS(
-                                   "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-
-# Read map of UN sub-regions, and select relevant regions (Europe and N America)
-un_sub <- readOGR(dsn = gsub("/","",dataDir),layer = "UN_subregion",verbose = FALSE)
-
-un_sub <- un_sub[(un_sub$SUBREGION %in% c(21,13,154,155,39)),]
-
-# Define plotting colours for UN sub-regions
-cols <- colorRampPalette(colors = c("#000000","#ffffff"))(5)
-
-par(mar=c(0,0,0,0))
-
-plot(un_sub,col=cols,xlim=c(-180,30))
-
-plot(occMap,add=TRUE,pch=16,cex=0.5,col="#cc0000")
-
-```
+The final dataset that we used in this study were derived from `r n.studies` original studies, and consist of `r n.records` records for `r n.species` bumblebee species, collected across `r n.sites` sites in `r n.countries` different countries in North America, and Western, Northern and Southern Europe: `r na.omit(countries2)` (Figure S1). The original samples of bumblebees that were collated in the PREDICTS database were collected in the field between `r first.year` and `r last.year`.
 
 ## Explanatory Variables
 
@@ -1268,7 +1236,7 @@ mtext(text = "D",side = 3,line=0,adj = -0.12,cex=2.5)
 
 ```
 
-The models deviated slightly from the assumptions of standard parametric statistical tests (Figure S1). Nevertheless, very similar model-predicted values were obtained when refitting the final best-fitting model using MCMC, which is a fundamentally different approach to fitting estimates of model parameters (Figure S2). Spatial autocorrelation was detected in the residuals associated with a slightly higher fraction (11.8%) of underlying studies than would be expected by chance (Figure S3).
+The models deviated slightly from the assumptions of standard parametric statistical tests (Figure S2). Nevertheless, very similar model-predicted values were obtained when refitting the final best-fitting model using MCMC, which is a fundamentally different approach to fitting estimates of model parameters (Figure S3). Spatial autocorrelation was detected in the residuals associated with a slightly higher fraction (11.8%) of underlying studies than would be expected by chance (Figure S4).
 
 ```{r preds_sites, echo=FALSE,results=FALSE}
 
