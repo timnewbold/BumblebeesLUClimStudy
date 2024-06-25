@@ -57,9 +57,10 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
+suppressMessages(suppressWarnings(library(terra)))
+suppressMessages(suppressWarnings(library(predictsFunctions)))
 suppressMessages(suppressWarnings(library(raster)))
 suppressMessages(suppressWarnings(library(rgdal)))
-suppressMessages(suppressWarnings(library(predictsFunctions)))
 # To obtain this package, run:
 # remotes::install_github("timnewbold/predicts-demo",subdir="predictsFunctions")
 
@@ -100,14 +101,58 @@ diversity <- droplevels(diversity)
 # Read information on climatic position variables for the bumblebees
 sp.names <- read.table(paste(dataDir,"bombus_stacknames.txt",sep=""))
 
+# Define WGS84 coordinate system
+wgsCRS <- '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0'
+
 TEI_bl <- readRDS(paste(dataDir,"BaselineTEI_Spp.rds",sep=""))
 names(TEI_bl) <- paste("Bombus_",sp.names$x,sep="")
+TEI_bl <- rast(TEI_bl)
+crs(TEI_bl) <- wgsCRS
 PEI_bl <- readRDS(paste(dataDir,"BaselinePEI_Spp.rds",sep=""))
 names(PEI_bl) <- paste("Bombus_",sp.names$x,sep="")
+PEI_bl <- rast(PEI_bl)
+crs(PEI_bl) <- wgsCRS
 TEI_delta <- readRDS(paste(dataDir,"DeltaTEI_Spp_Period3.rds",sep=""))
 names(TEI_delta) <- paste("Bombus_",sp.names$x,sep="")
+TEI_delta <- rast(TEI_delta)
+crs(TEI_delta) <- wgsCRS
 PEI_delta <- readRDS(paste(dataDir,"DeltaPEI_Spp_Period3.rds",sep=""))
 names(PEI_delta) <- paste("Bombus_",sp.names$x,sep="")
+PEI_delta <- rast(PEI_delta)
+crs(PEI_delta) <- wgsCRS
+
+## Check correspondence between measures based on old and new CRU data
+
+# Get species names for layers based on CRU4
+sp.names.4 <- read.csv(paste0(dataDir,"ThermalLimits_CRU4/species_names.csv"))
+
+TEI_bl_4 <- readRDS(paste0(dataDir,"ThermalLimits_CRU4/baselineTPI_Spp.RDS"))
+names(TEI_bl_4) <- sp.names.4$species
+TEI_bl_4 <- rast(TEI_bl_4)
+TEI_bl_4 <- terra::project(x = TEI_bl_4,y = TEI_bl)
+
+TEI_delta_4 <- readRDS(paste0(dataDir,"ThermalLimits_CRU4/deltaTPI_Spp.RDS"))
+names(TEI_delta_4) <- sp.names.4$species
+TEI_delta_4 <- rast(TEI_delta_4)
+TEI_delta_4 <- terra::project(x = TEI_delta_4,y = TEI_delta)
+
+cor.tei.bl <- sapply(X = intersect(sp.names$x,sp.names.4$species),FUN = function(sp){
+  
+  rast.old <- TEI_bl[[paste0("Bombus_",sp)]]
+  rast.4 <- TEI_bl_4[[sp]]
+  
+  return(cor.test(values(rast.old),values(rast.4))$estimate)
+  
+})
+
+cor.tei.delta <- sapply(X = intersect(sp.names$x,sp.names.4$species),FUN = function(sp){
+  
+  rast.old <- TEI_delta[[paste0("Bombus_",sp)]]
+  rast.4 <- TEI_delta_4[[sp]]
+  
+  return(cor.test(values(rast.old),values(rast.4))$estimate)
+  
+})
 
 # Add climatic position variables to the data frame
 diversity <- do.call('rbind',lapply(X = split(
@@ -115,33 +160,48 @@ diversity <- do.call('rbind',lapply(X = split(
   FUN = function(div.sp){
   
   sp <- gsub(" ","_",div.sp$Best_guess_binomial[1])
+  sp2 <- strsplit(paste(div.sp$Best_guess_binomial[1])," ")[[1]][2]
   
   if (sp %in% names(TEI_bl)){
-    div.sp$TEI_BL <- raster::extract(
-      x = TEI_bl[[sp]],y = div.sp[,c('Longitude','Latitude')])
+    div.sp$TEI_BL <- terra::extract(
+      x = TEI_bl[[sp]],y = div.sp[,c('Longitude','Latitude')])[[sp]]
   } else {
     div.sp$TEI_BL <- NA
   }
   
   if (sp %in% names(PEI_bl)){
-    div.sp$PEI_BL <- raster::extract(
-      x = PEI_bl[[sp]],y = div.sp[,c('Longitude','Latitude')])
+    div.sp$PEI_BL <- terra::extract(
+      x = PEI_bl[[sp]],y = div.sp[,c('Longitude','Latitude')])[[sp]]
   } else {
     div.sp$PEI_BL <- NA
   }
   
   if (sp %in% names(TEI_delta)){
-    div.sp$TEI_delta <- raster::extract(
-      x = TEI_delta[[sp]],y = div.sp[,c('Longitude','Latitude')])
+    div.sp$TEI_delta <- terra::extract(
+      x = TEI_delta[[sp]],y = div.sp[,c('Longitude','Latitude')])[[sp]]
   } else {
     div.sp$TEI_delta <- NA
   }
   
   if (sp %in% names(PEI_delta)){
-    div.sp$PEI_delta <- raster::extract(
-      x = PEI_delta[[sp]],y = div.sp[,c('Longitude','Latitude')])
+    div.sp$PEI_delta <- terra::extract(
+      x = PEI_delta[[sp]],y = div.sp[,c('Longitude','Latitude')])[[sp]]
   } else {
     div.sp$PEI_delta <- NA
+  }
+  
+  if (sp2 %in% names(TEI_bl_4)){
+    div.sp$TEI_BL_4 <- terra::extract(
+      x = TEI_bl_4[[sp2]],y = div.sp[,c('Longitude','Latitude')])[[sp2]]
+  } else {
+    div.sp$TEI_BL_4 <- NA
+  }
+  
+  if (sp2 %in% names(TEI_delta_4)){
+    div.sp$TEI_delta_4 <- terra::extract(
+      x = TEI_delta_4[[sp2]],y = div.sp[,c('Longitude','Latitude')])[[sp2]]
+  } else {
+    div.sp$TEI_delta_4 <- NA
   }
   
   return(div.sp)
@@ -164,51 +224,70 @@ diversity$LandUse <- factor(diversity$LandUse,levels=c("Natural","Human"))
 diversity$occur <- ifelse(diversity$Measurement>0,1,0)
 
 # Define equal-area (Behrmann) and geographic (WGS84) projections
-behrCRS <- CRS('+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 +datum=WGS84 +ellps=WGS84 +units=m +no_defs')
-wgsCRS <- CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
+behrCRS <- '+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 +datum=WGS84 +ellps=WGS84 +units=m +no_defs'
+wgsCRS <- '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0'
 
 # Read elevation and add to data frame
-elev <- raster(paste0(dataDir,"wc2.1_30s_elev.tif"))
+elev <- rast(paste0(dataDir,"wc2.1_30s_elev.tif"))
 
-diversity$Elevation <- raster::extract(
-  x = elev,y = diversity[,c('Longitude','Latitude')])
+diversity$Elevation <- terra::extract(
+  x = elev,y = diversity[,c('Longitude','Latitude')])$wc2.1_30s_elev
 
 # Read data on landscape percent natural habitat and add to data frame
-nathab <- raster(paste0(mapDir,"PercentNatural.tif"))
+nathab.1 <- rast(paste0(mapDir,"PercentNaturalHabitat1k.tif"))
+nathab.2 <- rast(paste0(mapDir,"PercentNaturalHabitat2k.tif"))
+nathab.5 <- rast(paste0(mapDir,"PercentNaturalHabitat5k.tif"))
+nathab.10 <- rast(paste0(mapDir,"PercentNaturalHabitat10k.tif"))
 
-nathab <- raster::crop(nathab,extent(-16500000,16500000,-6000000,7000000))
+# Project to geographic coordiinates, for matching with the PREDICTS sites
+nathab.1 <- terra::project(x = nathab.1,y = wgsCRS)
+nathab.2 <- terra::project(x = nathab.2,y = wgsCRS)
+nathab.5 <- terra::project(x = nathab.5,y = wgsCRS)
+nathab.10 <- terra::project(x = nathab.10,y = wgsCRS)
 
-nathab <- raster::projectRaster(from = nathab,crs = wgsCRS)
+# Extract values to the biodiversity data frame
+diversity$NaturalHabitat1k <- terra::extract(
+  x = nathab.1,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
+diversity$NaturalHabitat2k <- terra::extract(
+  x = nathab.2,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
+diversity$NaturalHabitat5k <- terra::extract(
+  x = nathab.5,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
+diversity$NaturalHabitat10k <- terra::extract(
+  x = nathab.10,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
 
-diversity$NaturalHabitat <- raster::extract(
-  x = nathab,y = diversity[,c('Longitude','Latitude')])
+# Read estimates of pesticide toxicity and add to data frame
+pest.tox.l <- rast(paste0(mapDir,"Pesticide_TotalToxicity_Low.tif"))
+pest.tox.h <- rast(paste0(mapDir,"Pesticide_TotalToxicity_High.tif"))
 
-# Read data on pesticide application and add to data frame
-pest <- raster(paste0(mapDir,"Pesticide_totalAPR_Low.tif"))
-pest.h <- raster(paste0(mapDir,"Pesticide_totalAPR_High.tif"))
+# Replace NA values with zeroes
+values(pest.tox.l)[(is.na(values(pest.tox.l)))] <- 0
+values(pest.tox.h)[(is.na(values(pest.tox.h)))] <- 0
 
-diversity$Pesticide <- raster::extract(
-  x = pest,y = diversity[,c('Longitude','Latitude')])
+diversity$PestToxLow <- terra::extract(
+  x = pest.tox.l,y = diversity[,c('Longitude','Latitude')])$sum
 
-diversity$PesticideHigh <- raster::extract(
-  x = pest.h,y = diversity[,c('Longitude','Latitude')])
+diversity$PestToxHigh <- terra::extract(
+  x = pest.tox.h,y = diversity[,c('Longitude','Latitude')])$sum
 
 # Read data on fertilizer application and add to data frame
-fert <- raster(paste0(mapDir,"FertilizerMap.tif"))
+fert <- rast(paste0(mapDir,"FertilizerMap.tif"))
 
-diversity$Fertilizer <- raster::extract(
-  x = fert,y = diversity[,c('Longitude','Latitude')])
+# Replace NA values with zeroes
+values(fert)[is.na(values(fert))] <- 0
+
+diversity$Fertilizer <- terra::extract(
+  x = fert,y = diversity[,c('Longitude','Latitude')])$sum
 
 # Read data on time since 30% landscape conversion to human uses 
-YOC30 <- raster(paste0(dataDir,"yocPS15002005_1_0.3.asc"))
+YOC30 <- rast(paste0(dataDir,"yocPS15002005_1_0.3.asc"))
 # Where land hasn't yet been converted, set year of conversion to most recent year
 values(YOC30)[values(YOC30)==0] <- 2005
 # Calculate number of years from landscape conversion to most recent year
 AgeConv <- 2005 - YOC30
 
 # Add time since conversion to data frame
-diversity$AgeConv <- raster::extract(
-  x = AgeConv,y = diversity[,c('Longitude','Latitude')])
+diversity$AgeConv <- terra::extract(
+  x = AgeConv,y = diversity[,c('Longitude','Latitude')])$yocPS15002005_1_0.3
 
 cat('Saving diversity data\n')
 # Save data for modelling
@@ -248,4 +327,4 @@ t.end <- Sys.time()
 
 print(round(t.end - t.start,0))
 
-sink()
+# sink()
