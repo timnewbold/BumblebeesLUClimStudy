@@ -18,11 +18,7 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
-suppressMessages(suppressWarnings(library(StatisticalModels)))
-# To install this package, run the following code:
-# remotes::install_github("timnewbold/StatisticalModels")
-suppressMessages(suppressWarnings(library(rgdal)))
-suppressMessages(suppressWarnings(library(DHARMa)))
+suppressMessages(suppressWarnings(library(brms)))
 
 # Print session information
 sessionInfo()
@@ -36,6 +32,9 @@ diversity$LogElevation <- log(diversity$Elevation+2)
 # Log-transform fertilizer application, which is also very skewed
 diversity$LogFertilizer <- log(diversity$Fertilizer+1)
 
+# Log-transform pesticide application, which is also very skewed
+diversity$LogPestToxLow <- log(diversity$PestToxLow+1)
+
 diversity$UI <- paste(diversity$LandUse,diversity$Use_intensity,sep="_")
 diversity$UI[grepl("Natural",diversity$UI)] <- "Natural"
 diversity$UI[grepl("NA",diversity$UI)] <- NA
@@ -48,8 +47,8 @@ modelData <- diversity[,c('occur','LandUse','TEI_BL',
                           'TEI_delta','LogElevation','SS','SSBS',
                           'Taxon_name_entered','Longitude','Latitude',
                           'Best_guess_binomial','Country',
-                          'Pesticide','LogFertilizer',
-                          'NaturalHabitat','AgeConv')]
+                          'LogPestToxLow',
+                          'NaturalHabitat2k','AgeConv')]
 # Remove rows with any NA values
 modelData <- na.omit(modelData)
 
@@ -60,70 +59,31 @@ sites <- unique(modelData[,c('SSBS','Longitude','Latitude')])
 
 saveRDS(object = sites,file = paste0(outDir,"AnalysisSites.rds"))
 
-# Candidate fixed-effect structures
-candidate.fixefs <- list(
-  ## Null model
-  "1",
-  ## Land-use only
-  "LandUse",
-  ## Single variable groups (in addition to land use):
-  # Landscape natural habitat
-  "LandUse+poly(NaturalHabitat,2)",
-  # Intensity factors - fertilizer and pesticide
-  "LandUse+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)",
-  # Land-use history
-  "LandUse+poly(AgeConv,2)",
-  # Climatic variables
-  "LandUse+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-  ## Two groups of variables at a time
-  # Natural habitat and intensity
-  "LandUse+poly(NaturalHabitat,2)+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)",
-  # Natural habitat and land-use history
-  "LandUse+poly(NaturalHabitat,2)+poly(AgeConv,2)",
-  # Natural habitat and climate
-  "LandUse+poly(NaturalHabitat,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-  # Intensity and land-use history
-  "LandUse+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(AgeConv,2)",
-  # Intensity and climate
-  "LandUse+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-  # Land-use history and climate
-  "LandUse+poly(AgeConv,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-  ## Three groups of variables at a time
-  # Natural habitat, intensity and land-use history
-  "LandUse+poly(NaturalHabitat,2)+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(AgeConv,2)",
-  # Natural habitat, intensity and climate
-  "LandUse+poly(NaturalHabitat,2)+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-  # Natural habitat, land-use history and climate
-  "LandUse+poly(NaturalHabitat,2)+poly(AgeConv,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-  # Intensity, land-use history and climate
-  "LandUse+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(AgeConv,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)",
-  ## All four variable groups together
-  "LandUse+poly(NaturalHabitat,2)+poly(Pesticide,1)+LandUse:poly(Pesticide,1)+poly(LogFertilizer,2)+poly(AgeConv,2)+poly(TEI_BL,2)+poly(TEI_delta,1)+LandUse:poly(TEI_BL,2)+LandUse:poly(TEI_delta,1)+poly(TEI_BL,2):poly(TEI_delta,1)"
-)
+# Run model using BRMS
+model <- brm(formula = occur~
+               # Control for elevational effects
+               poly(LogElevation,1)+
+               # Main effects of land use, and landscape pesticide toxicity and
+               # conversion age
+               LandUse+
+               poly(NaturalHabitat2k,1)+
+               poly(LogPestToxLow,1)+
+               poly(AgeConv,1)+
+               # Interactions between land use and other variables
+               LandUse:poly(NaturalHabitat2k,1)+
+               LandUse:poly(LogPestToxLow,1)+
+               LandUse:poly(AgeConv,1)+
+               # Climate niche variables and interactions
+               poly(TEI_BL,2)+poly(TEI_delta,1)+
+               poly(TEI_BL,2):poly(TEI_delta,1)+
+               LandUse:poly(TEI_BL,2)+
+               LandUse:poly(TEI_delta,1)+
+               # Random effects
+               (1|SS)+(1|SSBS)+(1|Taxon_name_entered),
+             data=modelData,family='bernoulli',
+             iter=2000,chains=4,cores=4)
 
-# Run a set of models with these candidate fixed-effects structures
-models <- GLMERCandidates(modelData = modelData,responseVar = "occur",
-                          fitFamily = "binomial",
-                          candidateFixedStructs = candidate.fixefs,
-                          randomStruct = "(1|SS)+(1|SSBS)+(1|Taxon_name_entered)")
-
-# Save the final models
-saveRDS(object = models,file = paste0(outDir,"FinalModels.rds"))
-
-# Get the AIC values of each model
-aics <- unlist(lapply(models,AIC))
-
-# Identify the best-fitting model (lowest AIC)
-bestModel <- which(aics==min(aics))
-
-# Test for over-dispersion in the residuals of the best model
-DHARMa::testDispersion(models[[bestModel]],alternative = "greater")
-
-# Run model performance check
-simOut <- DHARMa::simulateResiduals(fittedModel = models[[bestModel]])
-
-# Plot results of model performance check
-plot(simOut)
+saveRDS(model,paste0(outDir,"FinalModelBRMS.rds"))
 
 # End timer
 t.end <- Sys.time()
