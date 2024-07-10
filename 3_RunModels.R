@@ -75,7 +75,6 @@ model <- brm(formula = occur~
                LandUse:poly(AgeConv,1)+
                # Climate niche variables and interactions
                poly(TEI_BL,2)+poly(TEI_delta,1)+
-               poly(TEI_BL,2):poly(TEI_delta,1)+
                LandUse:poly(TEI_BL,2)+
                LandUse:poly(TEI_delta,1)+
                # Random effects
@@ -84,6 +83,12 @@ model <- brm(formula = occur~
              iter=2000,chains=4,cores=4)
 
 saveRDS(model,paste0(outDir,"FinalModelBRMS.rds"))
+
+pdf(file = paste0(outDir,"ModelResultsDiagnostics.pdf"),width = 16,height = 24)
+
+plot(model,ask = FALSE)
+
+invisible(dev.off())
 
 # End timer
 t.end <- Sys.time()
