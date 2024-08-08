@@ -84,6 +84,20 @@ model <- brm(formula = occur~
 
 saveRDS(model,paste0(outDir,"FinalModelBRMS.rds"))
 
+# Run a model with just land use, for comparison later
+modelLU <- brm(formula = occur~
+               # Control for elevational effects
+               poly(LogElevation,1)+
+               # Main effects of land use, and landscape pesticide toxicity and
+               # conversion age
+               LandUse+
+               # Random effects
+               (1|SS)+(1|SSBS)+(1|Taxon_name_entered),
+             data=modelData,family='bernoulli',
+             iter=2000,chains=4,cores=4)
+
+saveRDS(modelLU,paste0(outDir,"FinalModelLandUseOnly.rds"))
+
 pdf(file = paste0(outDir,"ModelResultsDiagnostics.pdf"),width = 16,height = 24)
 
 plot(model,ask = FALSE)
