@@ -119,27 +119,21 @@ The final dataset that we used in this study was derived from `r n.studies` orig
 
 ## Explanatory Variables
 
-We considered land use in our analysis by dividing sampled sites into either natural or human-modified habitats. In the PREDICTS database, land use is classified into one of six broad categories: primary vegetation (natural habitat with no record of being destroyed), secondary vegetation (habitat recovering to its natural state after past destruction by human actions or extreme natural events), plantation forests (areas used to cultivate woody crops), cropland (areas used to cultivate herbaceous crops, including as fodder for livestock), pasture (areas used regularly or permanently to graze livestock), and urban (areas of human settlement or other buildings, or areas managed for human recreation). We treated primary and secondary vegetation as natural habitats, and all other land-use types as human-modified.
+We considered land use in our analysis by dividing sampled sites into either natural or human-modified habitats. In the PREDICTS database, land use is classified into one of six broad categories: primary vegetation (natural habitat with no record of being destroyed), secondary vegetation (habitat recovering to its natural state after past destruction by human actions or extreme natural events), plantation forests (areas used to cultivate woody crops), cropland (areas used to cultivate herbaceous crops, including as fodder for livestock), pasture (areas used regularly or permanently to graze livestock), and urban (areas of human settlement or other buildings, or areas managed for human recreation). We treated primary and secondary vegetation as natural habitats, and all other land-use types as human-modified. Although flying insects such as bumblebees may respond more strongly to landscape habitat availability (variable described below) than to the local land-use conditions [@Janousek2023], local land-use conditions can be important [@Evans2018], and are considered here partly also because such local land-use differences are fundamental to the sampling structure within the PREDICTS database [@Hudson2014].
 
-We investigated how variables describing surrounding habitat conditions, land-use intensity (specifically, chemical application) and species' temperature niche properties shape the occupancy of bumblebees in both natural and human-modified habitats.
+We investigated how variables describing surrounding habitat conditions, land-use intensity (specifically, cumulative pesticide toxicity) and species' temperature niche properties shape the occupancy of bumblebees in both natural and human-modified habitats.
 
-Information on habitat condition in the landscapes surrounding sampled sites comprised estimates of the availability of natural habitat, as well as the length of time that landscape habitat has been substantially modified by humans. Availability of surrounding natural habitats was measured as the percentage of natural habitat in the 5 &times; 5-km grid cell within which the biodiversity sample was taken. Original mapped estimates of different land-use types were from a down-scaled land-use projection for 2005 (the mid-point of original field sampling of data included in this analysis; see previous sub-section) at 30-arc-second spatial resolution (approximately 1 km at the Equator) [@Hoskins2016]. These land-use maps estimate the fraction of each grid cell covered by five out of the six land-use types recognised in the PREDICTS database (not plantation forests). Following our classification of overall land-use type (see above), we summed the primary and secondary vegetation maps to obtain estimates of natural habitat. We projected and resampled this map of the fractional cover of natural habitat at 30-arc-second resolution to an equal-area grid (Behrmann projection) at 1-km resolution, using bilinear interpolation (implemented using the projectRaster function of the raster R package Version 3.5-29; [@Hijmans2021]). We then aggregated the resulting 1-km map by a factor of five, calculating the mean fractional cover of natural habitat for each 25-cell spatial cluster, yielding the final map at 5-km resolution. We derived estimates of the duration of substantial human habitat modification from the land-use harmonisation project land-use reconstruction at 0.5° spatial resolution [@Hurtt2011]. The historical land-use estimates describe reconstructed changes in the fractional cover of primary vegetation, secondary vegetation, croplands, pastures and urban areas from 1500 to 2005. We measured the duration of substantial human habitat modification as the number of years since a 0.5° grid cell was first 30% converted to human-modified land-use types (croplands, pastures or urban areas). Grid cells that have never yet reached the conversion threshold of 30% are considered to have a duration of substantial landscape modification of 0 years. Above 30% loss of natural habitats from landscapes the most sensitive species are typically substantially negatively impacted [@Andren1994].
+Information on habitat condition in the landscapes surrounding sampled sites comprised estimates of the availability of natural habitat, as well as the length of time that landscape habitat has been substantially modified by humans. Availability of surrounding natural habitats was measured as the percentage of natural habitat in the 5 &times; 5-km grid cell within which the biodiversity sample was taken (we tested the robustness of our results when using natural habitat estimated also in 1-km, 2-km and 10-km grid cells). Original mapped estimates of different land-use types were from a down-scaled land-use projection for 2005 (the mid-point of original field sampling of data included in this analysis; see previous sub-section) at 30-arc-second spatial resolution (approximately 1 km at the Equator) [@Hoskins2016]. These land-use maps estimate the fraction of each grid cell covered by five out of the six land-use types recognised in the PREDICTS database (not plantation forests). Following our classification of overall land-use type (see above), we summed the primary and secondary vegetation maps to obtain estimates of natural habitat. We projected and resampled this map of the fractional cover of natural habitat at 30-arc-second resolution to an equal-area grid (Behrmann projection) at 1-km resolution, using bilinear interpolation (implemented using the project function of the terra R package Version 1.7-71; [@Hijmans2024]). We then aggregated the resulting 1-km map by factors of two, five or ten, calculating the mean fractional cover of natural habitat in the coarser grid cells. We derived estimates of the duration of substantial human habitat modification from the land-use harmonisation project land-use reconstruction at 0.5° spatial resolution [@Hurtt2011]. The historical land-use estimates describe reconstructed changes in the fractional cover of primary vegetation, secondary vegetation, croplands, pastures and urban areas from 1500 to 2005. We measured the duration of substantial human habitat modification as the number of years since a 0.5° grid cell was first 30% converted to human-modified land-use types (croplands, pastures or urban areas). Grid cells that have never yet reached the conversion threshold of 30% are considered to have a duration of substantial landscape modification of 0 years. Above 30% loss of natural habitats from landscapes, the most sensitive species are typically substantially negatively impacted [@Andren1994].
 
-We considered the density (kg/ha) of application of two classes of chemicals: pesticides and fertilisers. We derived recent modelled estimates of pesticide application density across a 5-arc-minutes (approximately 10 km at the Equator) global spatial grid [@Maggi2019]. We used the low rather than high modelled estimates from this dataset, to be conservative, but tested the robustness of our models to using the high estimates instead. We obtained estimates of fertiliser application rates from global modelled estimates, also at 5-arc-minutes spatial resolution [@Mueller2012]. Estimates are available of total nitrogen, phosphorous and potassium application rates on each of 17 major global crops. We summed application rates for all three nutrients and all 17 crops to generate an estimate of total fertiliser application rate. 
+To calculate pesticide toxicity, we used modelled estimates of the density (kg/ha) of application of X different pesticides across a 5-arc-minutes (approximately 10 km at the Equator) global spatial grid [@Maggi2019]. We used the low rather than high modelled estimates from this dataset, to be conservative, but tested the robustness of our models to using the high estimates instead. Estimates of application density for each pesticide chemical were divided by estimates of LD50 for that chemical (from ref), using estimates for honeybees, since there are very few estimates for bumblebees. [Add more details].
 
 For information on species temperature niche properties, we used previously published methods and associated records of bumblebee occupancy [@Soroye2020]. Specifically, we estimated: 1) the exposure of a species' population to extreme high temperatures relative to its realized temperature niche in a baseline period before the onset of rapid climate changes (1901 &mdash; 1975); and 2) the change in exposure caused by climate change between the baseline period and a more recent period (2000 &mdash; 2014). Realized temperature niche limits were estimated for each species as the mean of the five lowest minimum monthly temperatures and the maximum of the five highest maximum monthly temperatures across all bumblebee spatial records in the baseline period. To measure the exposure of each species' population to extreme high temperatures in either the baseline or recent period, we then derived the maximum monthly temperatures for all twelve months in each baseline or recent year. These maximum monthly temperatures were rescaled such that a value of 0 equates to the minimum realized temperature niche limit of the species, and a value of 1 to the maximum niche limit. We then averaged the 12 monthly values to derive an annual mean exposure. Finally, we averaged the annual exposure estimates across all years in either the baseline or recent period. Thus, we were able to estimate, for any biodiversity record, the average exposure to extreme high temperatures in the baseline period, or the change in exposure between the baseline and recent periods. Monthly minimum and maximum temperature estimates for the period 1901 to 2015 were obtained from the CRU global gridded climate reconstruction Version 3.24.01 [@CRU32401], which was the most recent version of this dataset available at the time of calculation.
 
 ## Statistical Analysis
 
-To analyse the presence or absence of bumblebee species at the sampled locations, we used binomial generalised linear mixed-effects models, to account for the hierarchical structure of the PREDICTS database. Species were considered absent if they were not recorded but had been targeted by a particular study (typically these were species sampled in at least one other sampled site within a study). As random effects, we fitted: 1) Study identity, to control for differences in sampling protocols and broad geographic differences; 2) Site identity nested within study identity, to control for site-specific factors; and 3) Species identity, to account for variation in responses among species. Although there may be important differences between the two continents in average occupancy of bumblebees, as well as in responses to the considered explanatory variables, the dataset was too small to include such variation in the models.
+To analyse the presence or absence of bumblebee species at the sampled locations, we used a binomial (Bernoulli family) Bayesian hierarchical model, accounting for the hierarchical structure of the PREDICTS database. Species were considered absent if they were not recorded but had been targeted by a particular study (typically these were species sampled in at least one other sampled site within a study). As random effects, we fitted: 1) Study identity, to control for differences in sampling protocols and broad geographic differences; 2) Site identity nested within study identity, to control for site-specific factors; and 3) Species identity, to account for variation in responses among species. Although there may be important differences between the two continents in average occupancy of bumblebees, as well as in responses to the considered explanatory variables, the dataset was too small to include such variation in the models. As fixed effects, we considered local land use, lanscape-level natural habitat availability, the length of time that the landscape has been substantially modified by human land use, cumulative pesticide toxicity, baseline position with species' thermal niche, and change in this position between the baseline and recent periods. To avoid model over-fitting, given the small size of the dataset, we fitted linear effects for all continuous variables, but a quadratic effect of baseline thermal niche position, because there is strong reason to expect a non-linear effect for this variable. We further considered interactions between local land use and the other continuous variables. We also explored interactions with landscape-level natural habitat availability, but estimated coefficients for these interactions were subject to a high degree of uncertainty, probably owing to slight correlations among the different landscape-level variables. All models were implemented in the brms R package Version 2.21.0 [@Burkner2021]. We ran 4 chains, and assessed convergence by inspection of Rhat values (all values were &le; 1.01). Chains were run with a burn-in of 1,000 iterations.
 
-We considered a candidate set of models with different fixed-effects structures. First, we fitted a null, intercept-only model (nevertheless including the random effects). Second, a model with only land use. Third, models with land use and all possible combinations of the different broad classes of explanatory variables (landscape habitat, land-use intensity, and climatic niche properties), and also interactions between these additional explanatory variables and land use (Table \@ref(tab:tablestats)). We assessed model fit to the data using AIC values. For each model $i$ in the set of models $I$, we calculated the difference in its AIC compared to the best-fitting model, $\Delta_i$, and the model AIC weight, $AIC_w$: 
-
-$$AIC_w=\frac{e^{-\frac{1}{2}\Delta_i}}{\sum_{i=1}^{I}{(e^{-\frac{1}{2}\Delta_i})}}$$
-
-We also calculated the sum of AIC weights of all models containing a particular class of explanatory variable. In addition to comparing the statistical support for models by comparing AIC values and AIC weights, we also estimated model explanatory power by computing pseudo R^2^ values following [@Nakagawa2013], conducted model diagnostic tests using the DHARMa package Version 0.4.5 in R [@DHARMa], and tested for spatial autocorrelation in the residuals associated with each underlying study using Moran's test, implemented in the spdep package Version 1.2-8.
-
-To reveal the impacts that environmental changes to date have had on bumblebee occupancy across both natural habitats and human-modified habitats, we used our final set of models to infer biodiversity changes across the sampled sites, based on the values of the model explanatory variables at those sites at the time of biodiversity sampling. These estimates thus included the impacts on both natural and modified habitats of climate change, and the modification of landscapes by human land use. Estimates of biodiversity at the time of sampling were expressed as a percentage difference compared to a baseline condition in which we assumed that landscapes were entirely composed of natural habitat, with no history of human modification, subject to no application of fertilizers and pesticides, and with no change in climate. To derive model-estimated differences between baseline and contemporary conditions, we randomly generated 1,000 estimates of percentage difference to represent both model and parameter uncertainty. Thus, each estimate was generated by: 1) drawing at random from among the candidate models, weighted by their AIC weights (see above); 2) drawing a set of parameters from this chosen model from a multivariate normal distribution, with means being the model-estimated coefficients, the standard deviation from the coefficient uncertainties, and parameter correlations derived from the variance-covariance matrix; 3) using these parameters to estimate average bumblebee probability of occurrence under baseline and contemporary environmental conditions; and 4) calculating the percentage difference in average occurrence probability between baseline and contemporary conditions.
+To reveal the impacts that environmental changes to date have had on bumblebee occupancy across both natural habitats and human-modified habitats, we used our model to infer biodiversity changes across the sampled sites, based on the values of the model explanatory variables at those sites at the time of biodiversity sampling. These estimates thus included the impacts on both natural and modified habitats of climate change, and the modification of landscapes by human land use. Estimates of biodiversity at the time of sampling were expressed as a percentage difference compared to a baseline condition in which we assumed that landscapes were entirely composed of natural habitat, with no history of human modification, subject to no application of pesticides, and with no change in climate. To derive model-estimated differences between baseline and contemporary conditions, with uncertainty, we drew 1,000 sets of coefficient estimates from the posterior samples of the model. Each of these coefficient estimates was used to estimate average bumblebee probability of occurrence under both baseline and contemporary environmental conditions, from which we calculated 1,000 estimates of the percentage difference in average occurrence probability between baseline and contemporary conditions.
 
 # Results
 
@@ -147,19 +141,23 @@ To reveal the impacts that environmental changes to date have had on bumblebee o
 ```{r results_setup, echo=FALSE,warning=FALSE}
 #### Model results plot - Setup ####
 
-set.seed(1234)
+# set.seed(1234)
 
 # Set input directory
 inDir <- "3_RunModels/"
 
 # Load required packages
-suppressMessages(suppressWarnings(library(StatisticalModels)))
+suppressMessages(suppressWarnings(library(brms)))
+suppressMessages(suppressWarnings(library(Hmisc)))
+suppressMessages(suppressWarnings(library(ggplot2)))
+suppressMessages(suppressWarnings(library(ggstance)))
+suppressMessages(suppressWarnings(library(cowplot)))
 
 # Log-transform elevation, which is very skewed
 diversity$LogElevation <- log(diversity$Elevation+2)
 
-# Log-transform fertilizer application, which is also very skewed
-diversity$LogFertilizer <- log(diversity$Fertilizer+1)
+# Log-transform pesticide application, which is also very skewed
+diversity$LogPestToxLow <- log(diversity$PestToxLow+1)
 
 diversity$UI <- paste(diversity$LandUse,diversity$Use_intensity,sep="_")
 diversity$UI[grepl("Natural",diversity$UI)] <- "Natural"
@@ -173,130 +171,87 @@ modelData <- diversity[,c('occur','LandUse','TEI_BL',
                           'TEI_delta','LogElevation','SS','SSBS',
                           'Taxon_name_entered','Longitude','Latitude',
                           'Best_guess_binomial','Country',
-                          'Pesticide','LogFertilizer',
-                          'NaturalHabitat','AgeConv')]
+                          'LogPestToxLow',
+                          'NaturalHabitat2k','AgeConv')]
+
 # Remove rows with any NA values
 modelData <- na.omit(modelData)
 
 # Load the final model
-finalModels <- readRDS(paste(inDir,"FinalModels.rds",sep=""))
+finalModel <- readRDS(paste0(inDir,"FinalModelBRMS.rds"))
 ```
 
-<!-- STATISTICS: Calculate AIC statistics for model reporting -->
+<!-- STATISTICS: Model statistics -->
 ```{r calc_stats,echo=FALSE,warning=FALSE}
-# Load required packages
-library(StatisticalModels)
 
-# Calculate the delta AIC of the land-use-only model compared to the null model
-lu.delta.aic <- round(AIC(finalModels[[2]]) - AIC(finalModels[[1]]),2)
+# Load the final model with just land use among the main
+# explanatory variables
+finalModelLU <- readRDS(paste0(inDir,"FinalModelLandUseOnly.rds"))
 
-# Extract the AIC values of all final models
-aics <- unlist(lapply(finalModels,AIC))
-
-# Calculate AIC differences for each model compared to the best-fitting model
-aic.diffs <- aics - min(aics)
-
-# Calculate the delta AIC of the best model compared to the null model
-best.delta.aic <- round(min(aics) - aics[1],2)
-
-# Calculate the AIC weights of each model
-aic.weights <- (exp(-0.5*aic.diffs))/(sum(exp(-0.5*aic.diffs)))
-
-# Specify the models that contain natural habitat variable
-nathab.mods <- c(3,7,8,9,13,14,15,17)
-
-# Calculate the sum of AIC weights of the models containing natural habitat variable
-aic.wt.sum.nathab <- round(sum(aic.weights[nathab.mods]),2)
-
-# Specify the models that contain land-use-intensity variables
-# (Pesticide and fertilizer application)
-intensity.mods <- c(4,7,10,11,13,14,16,17)
-
-# Calculate the sum of AIC weights of the models containing land-use-intensity variables
-aic.wt.sum.intensity <- round(sum(aic.weights[intensity.mods]),2)
-
-# Specify the models that contain land-use-history variable
-luhist.mods <- c(5,8,10,12,13,15,16,17)
-
-# Calculate the sum of AIC weights of the models containing land-use-history variable
-aic.wt.sum.luhist <- round(sum(aic.weights[luhist.mods]),2)
-
-# Specify the models containing climatic variables
-clim.mods <- c(6,9,11,12,14,15,16,17)
-
-# Calculate the sum of AIC weights of the models containing climatic variables
-aic.wt.sum.clim <- round(sum(aic.weights[clim.mods]),2)
-
-# Get the pseudo-r-squared values of all models
-r2.marginal <-unlist(lapply(finalModels,function(m) 
-  return(R2GLMER(m)$marginal)))
-r2.conditional <- unlist(lapply(finalModels,function(m) 
-  return(R2GLMER(m)$conditional)))
-
-
-# Get the pseudo-r-squared values of the most complex (and best-fitting) model
-r2.complex.mod.cond <- round(R2GLMER(model = finalModels[[17]])$conditional,2)
-r2.complex.mod.marg <- round(R2GLMER(model = finalModels[[17]])$marginal,3)
+# Get Bayesian pseudo-R2 values for the final model
+r2.marginal <- round(bayes_R2(finalModel,re.form=NA)[,'Estimate'],2)
+r2.conditional <- round(bayes_R2(finalModel)[,'Estimate'],2)
 
 # Get the pseudo-r-squared values of the land-use-only model
-r2.lu.mod.cond <- round(R2GLMER(model = finalModels[[2]])$conditional,2)
-r2.lu.mod.marg <- round(R2GLMER(model = finalModels[[2]])$marginal,4)
+r2.lu.mod.cond <- round(bayes_R2(finalModelLU)[,'Estimate'],2)
+r2.lu.mod.marg <- round(bayes_R2(finalModelLU,re.form=NA)
+                        [,'Estimate'],3)
+
+# Get the maximum Rhat value for the estimated coefficients
+max.rhat <- max(summary(finalModel)$fixed$Rhat)
 ```
 
 <!-- STATISTICS AND PLOTTING: Get modelled effects of land use -->
 ```{r preds_lu,echo=FALSE,warning=FALSE}
+suppressMessages(suppressWarnings(library(snow)))
+suppressMessages(suppressWarnings(library(parallel)))
 
 ### Land use
 # Create data frame with variable values for which to predict occurrence probability
-# Start with rows for natural and human land use
-nd <- data.frame(LandUse=factor(c("Natural","Human")))
-nd$LandUse <- relevel(x = nd$LandUse,ref = "Natural")
-# Set natural habitat, pesticide and landscape age variables at their median
-# values for each land-use type
-nd$NaturalHabitat <- c(
-  median(modelData[modelData$LandUse=="Natural",]$NaturalHabitat),
-  median(modelData[modelData$LandUse=="Human",]$NaturalHabitat))
-nd$Pesticide <- c(
-  median(modelData[modelData$LandUse=="Natural",]$Pesticide),
-  median(modelData[modelData$LandUse=="Human",]$Pesticide))
-nd$LogFertilizer <- c(
-  median(modelData[modelData$LandUse=="Natural",]$LogFertilizer),
-  median(modelData[modelData$LandUse=="Human",]$LogFertilizer))
-nd$AgeConv <- c(
-  median(modelData[modelData$LandUse=="Natural",]$AgeConv),
-  median(modelData[modelData$LandUse=="Human",]$AgeConv))
-# Set baseline TEI to be near range centre, the median of 
-# sampled values (i.e. = 0.59)
-nd$TEI_BL <- 0.59
+# Set elevation, natural habitat, and landscape age variables at their median
+# values (to reflect a 'typical' landscape)
+# Ignore pesticide toxicity for now (i.e., set to zero)
+# Set baseline TEI to be near range centre, but within 
+# sampled range (10th percentile of sampled values, i.e. = 0.59)
 # Set delta TEI to zero (i.e. no climate change)
-nd$TEI_delta <- 0
-# Add dummy variable representing the response variable
-nd$occur <- 0
+nd <- data.frame(LandUse=factor(c('Natural','Human'),
+                                levels=levels(modelData$LandUse)),
+                 NaturalHabitat2k=median(modelData$NaturalHabitat2k),
+                 LogPestToxLow=0,
+                 AgeConv=median(modelData$AgeConv),
+                 LogElevation=median(modelData$LogElevation),
+                 TEI_BL=0.59,TEI_delta=0)
 
-# Make predictions from model
-preds <- PredictGLMERMultiModel(model = finalModels,data = nd,nIters = 1000)
+cl <- makeCluster(detectCores()-1)
+clusterExport(cl = cl,varlist = c("finalModel","nd"))
 
-# Back-transform to occurrence probabilities
-preds <- 1/(1+exp(-preds))
+# Make 1,000 predictions of % difference between human-dominated
+# and natural habitats
+preds <- parSapply(cl = cl,X = 1:1000,FUN = function(i){
+  
+  # Draw one of the posterior parameter estimates at random
+  i <- sample(x = 1:4000,size = 1,replace = FALSE)
+  
+  # Use this set of posterior parameter estimates to get predicted
+  # probability of occurrence in natural and human-dominated habitats
+  preds <- brms::posterior_epred(
+    object = finalModel,newdata = nd,re_formula = NA,
+    draw_ids = i)[1,]
+  
+  # Calculate the % difference in probability of occurrence
+  # between natural and human-dominated habitat
+  y <- ((preds[2]/preds[1])*100)-100
+  
+  return(y)
+})
 
-# Rescale predictions to reference level (i.e. all probabilities = 1 in 
-# natural habitat)
-preds <- sweep(x = preds,MARGIN = 2,STATS = preds[1,],FUN = '/')
+stopCluster(cl)
 
-# Calculate summary statistics across predictions
-preds.median <- ((apply(X = preds,MARGIN = 1,FUN = median,na.rm=TRUE))*100)-100
-preds.lower.67 <- ((apply(X = preds,MARGIN = 1,FUN = quantile,probs=(1/6),
-                          na.rm=TRUE))*100)-100
-preds.upper.67 <- ((apply(X = preds,MARGIN = 1,FUN = quantile,probs=(5/6),
-                          na.rm=TRUE))*100)-100
-preds.lower.95 <- ((apply(X = preds,MARGIN = 1,FUN = quantile,probs=0.025,
-                       na.rm=TRUE))*100)-100
-preds.upper.95 <- ((apply(X = preds,MARGIN = 1,FUN = quantile,probs=0.975,
-                       na.rm=TRUE))*100)-100
-
-lu.human.loss.median <- -round(preds.median[2],1)
-lu.human.loss.upper <- -round(preds.lower.95[2],1)
-lu.human.loss.lower <- -round(preds.upper.95[2],1)
+# Get median predicted difference between natural and human-dominated
+# land uses, as well as the 95% credible intervals
+lu.human.loss.median <- -round(median(preds),1)
+lu.human.loss.upper <- -round(quantile(preds,0.025),1)
+lu.human.loss.lower <- -round(quantile(preds,0.975),1)
 
 ```
 
