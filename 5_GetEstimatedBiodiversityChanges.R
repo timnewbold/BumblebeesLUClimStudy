@@ -83,13 +83,20 @@ clusterExport(cl = cl,list = c("finalModel","nd.bl","nd.obs"))
 # Make 1,000 predictions of % difference between observed
 # and baseline conditions
 preds <- parSapply(cl = cl,X = 1:1000,FUN = function(i){
+  
+  # Draw one of the posterior parameter estimates at random
+  i <- sample(x = 1:4000,size = 1,replace = FALSE)
+  
+  # Use this set of posterior parameter estimates to get predicted
+  # probability of occurrence under baseline and observed environmental
+  # conditions
   y.bl <- brms::posterior_epred(
     object = finalModel,newdata = nd.bl,re_formula = NA,
-    ndraws = 1)[1,]
+    draw_ids = i)[1,]
   
   y.obs <- brms::posterior_epred(
     object = finalModel,newdata = nd.obs,re_formula = NA,
-    ndraws = 1)[1,]
+    draw_ids = i)[1,]
   
   y <- ((y.obs/y.bl)*100)-100
   
