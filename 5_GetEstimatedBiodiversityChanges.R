@@ -144,8 +144,16 @@ cat(paste0("Average decline in human-dominated land use = ",
 
 cat("\n\n")
 
-# Add median predictions to model data-frame 
-modelData$Pred <- y.median
+# Average predicted differences in occurrence probability across sampled sites
+y.median.sites <- tapply(X = y.median,INDEX = nd.obs$SSBS,FUN = mean)
+y.upper.sites <- tapply(X = y.upper.95,INDEX = nd.obs$SSBS,FUN = mean)
+y.lower.sites <- tapply(X = y.lower.95,INDEX = nd.obs$SSBS,FUN = mean)
+
+# Create data frame for site-level averages
+sites <- data.frame(y=y.median.sites,yplus=y.upper.sites,yminus=y.lower.sites,
+                    SSBS=names(y.median.sites))
+sites$Longitude <- nd.obs$Longitude[match(sites$SSBS,nd.obs$SSBS)]
+sites$Latitude <- nd.obs$Latitude[match(sites$SSBS,nd.obs$SSBS)]
 
 # Create basemap for North American and Western European sub-regions
 baseMap <- vect("0_data/UN_subregion.shp")
@@ -153,13 +161,13 @@ baseMap <- terra::subset(baseMap,baseMap$SUBREGION %in% c(21,13,154,155,39))
 baseMap <- st_as_sf(baseMap)
 
 # Create map of predictions for sites sampled in PREDICTS
-predsMap <- vect(x = modelData,geom=c("Longitude","Latitude"),
+predsMap <- vect(x = sites,geom=c("Longitude","Latitude"),
                  crs = '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
 predsMap <- st_as_sf(predsMap)
 
 # Plot base map and predictions for sampled locations
 mapPreds <- ggplot() + geom_sf(data = baseMap,fill = "#ffffff") + 
-  geom_sf(data=predsMap,mapping = aes(colour=Pred)) + 
+  geom_sf(data=predsMap,mapping = aes(colour=y)) + 
   scale_color_continuous(type = "viridis") + 
   scale_x_continuous(limits = c(-180,60)) + 
   theme_classic()
