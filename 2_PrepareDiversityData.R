@@ -289,6 +289,26 @@ AgeConv <- 2005 - YOC30
 diversity$AgeConv <- terra::extract(
   x = AgeConv,y = diversity[,c('Longitude','Latitude')])$yocPS15002005_1_0.3
 
+# For robustness checks, also get estimates of time since 10% and 50% conversion
+# to human-dominated land uses
+YOC10 <- rast(paste0(dataDir,"yocPS15002005_1_0.1.asc"))
+# Where land hasn't yet been converted, set year of conversion to most recent year
+values(YOC10)[values(YOC10)==0] <- 2005
+# Calculate number of years from landscape conversion to most recent year
+AgeConv10 <- 2005 - YOC10
+# Add time since conversion to data frame
+diversity$AgeConv10 <- terra::extract(
+  x = AgeConv10,y = diversity[,c('Longitude','Latitude')])$yocPS15002005_1_0.1
+
+YOC50 <- rast(paste0(dataDir,"yocPS15002005_1_0.5.asc"))
+# Where land hasn't yet been converted, set year of conversion to most recent year
+values(YOC50)[values(YOC50)==0] <- 2005
+# Calculate number of years from landscape conversion to most recent year
+AgeConv50 <- 2005 - YOC50
+# Add time since conversion to data frame
+diversity$AgeConv50 <- terra::extract(
+  x = AgeConv50,y = diversity[,c('Longitude','Latitude')])$yocPS15002005_1_0.5
+
 cat('Saving diversity data\n')
 # Save data for modelling
 saveRDS(object = diversity,file=paste0(outDir,"diversity_data.rds"))

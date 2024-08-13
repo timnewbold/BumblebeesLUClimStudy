@@ -49,6 +49,7 @@ modelData <- diversity[,c('occur','LandUse','TEI_BL',
                           'Best_guess_binomial','Country',
                           'LogPestToxLow',
                           'NaturalHabitat2k','AgeConv')]
+
 # Remove rows with any NA values
 modelData <- na.omit(modelData)
 
