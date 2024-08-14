@@ -120,46 +120,12 @@ forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
   geom_vline(mapping = aes(xintercept = 0)) +
   labs(x = "Effect size",y = element_blank()) +
   theme_classic() +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
   
 save_plot(filename = paste0(outDir,"CoefficientForestPlot.png"),plot = forestPlot,
-          base_height = 12/2.54,base_width = 20/2.54)
-
-#### Plotting (land use) ####
-
-# Create data frame with variable values for which to predict occurrence probability
-# Set elevation, natural habitat, and landscape age variables at their median
-# values (to reflect a 'typical' landscape)
-# Ignore pesticide toxicity for now (i.e., set to zero)
-# Set baseline TEI to be near range centre, but within 
-# sampled range (10th percentile of sampled values, i.e. = 0.59)
-# Set delta TEI to zero (i.e. no climate change)
-nd <- data.frame(NaturalHabitat2k=median(modelData$NaturalHabitat2k),
-                 LogPestToxLow=0,
-                 AgeConv=median(modelData$AgeConv),
-                 LogElevation=median(modelData$LogElevation),
-                 TEI_BL=0.59,TEI_delta=0)
-
-# Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
-preds.67 <- conditional_effects(x = finalModel,effects = "LandUse",
-                                conditions = nd,plot = FALSE,prob=0.67)
-preds.95 <- conditional_effects(x = finalModel,effects = "LandUse",
-                                conditions = nd,plot = FALSE,prob=0.95)
-
-plotLU <- ggplot() + 
-  geom_linerange(data = preds.95$LandUse, 
-                 mapping = aes(x = LandUse,ymin = lower__,ymax = upper__,
-                               col = LandUse)) +
-  geom_pointrange(data = preds.67$LandUse,
-                  mapping = aes(x = LandUse,y = estimate__,ymin = lower__,
-                                ymax = upper__,col = LandUse), 
-                  linewidth = 1, size = 0.8) + 
-  scale_colour_manual(values = c("#009F81","#A40122")) + 
-  geom_hline(mapping = aes(yintercept = preds.67$LandUse$estimate__[1]),
-             alpha = 0.3, linetype = 'dashed') + 
-  scale_y_continuous(name = "Probability of occurrence",limits = c(0,1)) + 
-  theme_classic() + 
-  theme(legend.position = "none")
+          base_height = 12/2.54,base_width = 17.5/2.54)
 
 #### Plotting (natural habitat) ####
 
@@ -167,13 +133,13 @@ plotLU <- ggplot() +
 # Set elevation and landscape age variables at their median
 # values (to reflect a 'typical' landscape)
 # Ignore pesticide toxicity for now (i.e., set to zero)
-# Set baseline TEI to be near range centre, but within 
-# sampled range (10th percentile of sampled values, i.e. = 0.59)
-# Set delta TEI to zero (i.e. no climate change)
+# Set baseline TEI to the median value
+# Set delta TEI to zero (i.e. ignore climate change effects)
 nd <- data.frame(LogPestToxLow=0,
                  AgeConv=median(modelData$AgeConv),
                  LogElevation=median(modelData$LogElevation),
-                 TEI_BL=0.59,TEI_delta=0)
+                 TEI_BL=median(modelData$TEI_BL),
+                 TEI_delta=0)
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "NaturalHabitat2k:LandUse",
@@ -198,7 +164,9 @@ plotHab <- ggplot() +
   scale_x_continuous(name = "Natural habitat (%)",limits = c(0,100)) + 
   scale_y_continuous(name = "Probability of occurrence",limits = c(0,1)) + 
   theme_classic() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
 
 #### Plotting (landscape conversion age) ####
 
@@ -206,13 +174,13 @@ plotHab <- ggplot() +
 # Set elevation and natural habitat variables at their median
 # values (to reflect a 'typical' landscape)
 # Ignore pesticide toxicity for now (i.e., set to zero)
-# Set baseline TEI to be near range centre, but within 
-# sampled range (10th percentile of sampled values, i.e. = 0.59)
-# Set delta TEI to zero (i.e. no climate change)
+# Set baseline TEI to the median value
+# Set delta TEI to zero (i.e. ignore climate change effects)
 nd <- data.frame(LogPestToxLow=0,
                  NaturalHabitat2k=median(modelData$NaturalHabitat2k),
                  LogElevation=median(modelData$LogElevation),
-                 TEI_BL=0.59,TEI_delta=0)
+                 TEI_BL=median(modelData$TEI_BL),
+                 TEI_delta=0)
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "AgeConv:LandUse",
@@ -237,7 +205,9 @@ plotAge <- ggplot() +
   scale_x_continuous(name = "Duration of modification (yrs)") + 
   scale_y_continuous(name = "Probability of occurrence",limits = c(0,1)) + 
   theme_classic() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
 
 
 #### Plotting (pesticide toxicity) ####
@@ -245,13 +215,13 @@ plotAge <- ggplot() +
 # Create data frame with variable values for which to predict occurrence probability
 # Set elevation, natural habitat and landscape age variables at their median
 # values (to reflect a 'typical' landscape)
-# Set baseline TEI to be near range centre, but within 
-# sampled range (10th percentile of sampled values, i.e. = 0.59)
-# Set delta TEI to zero (i.e. no climate change)
+# Set baseline TEI to the median value
+# Set delta TEI to zero (i.e. ignore climate change effects)
 nd <- data.frame(NaturalHabitat2k=median(modelData$NaturalHabitat2k),
                  AgeConv=median(modelData$AgeConv),
                  LogElevation=median(modelData$LogElevation),
-                 TEI_BL=0.59,TEI_delta=0)
+                 TEI_BL=median(modelData$TEI_BL),
+                 TEI_delta=0)
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "LogPestToxLow:LandUse",
@@ -276,7 +246,9 @@ plotPest <- ggplot() +
   scale_x_continuous(name = "Pesticide toxicity") + 
   scale_y_continuous(name = "Probability of occurrence",limits = c(0,1)) + 
   theme_classic() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
 
 
 #### Plotting (Baseline TEI) ####
@@ -315,7 +287,9 @@ plotTEI_bl <- ggplot() +
   scale_x_continuous(name = "Baseline thermal position") + 
   scale_y_continuous(name = "Probability of occurrence",limits = c(0,1)) + 
   theme_classic() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
 
 
 #### Plotting (delta TEI) ####
@@ -324,14 +298,12 @@ plotTEI_bl <- ggplot() +
 # Set elevation, natural habitat, and landscape age variables at their median
 # values (to reflect a 'typical' landscape)
 # Ignore pesticide toxicity for now (i.e., set to zero)
-# Set baseline TEI to be near range centre, but within 
-# sampled range (10th percentile of sampled values, i.e. = 0.59)
-# Set delta TEI to zero (i.e. no climate change)
+# Set baseline TEI to the median value
 nd <- data.frame(NaturalHabitat2k=median(modelData$NaturalHabitat2k),
                  LogPestToxLow=0,
                  AgeConv=median(modelData$AgeConv),
                  LogElevation=median(modelData$LogElevation),
-                 TEI_BL=0.59)
+                 TEI_BL=median(modelData$TEI_BL))
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "TEI_delta:LandUse",
@@ -356,13 +328,17 @@ plotTEI_delta <- ggplot() +
   scale_x_continuous(name = "\u0394 thermal position") + 
   scale_y_continuous(name = "Probability of occurrence",limits = c(0,1)) + 
   theme_classic() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
 
-plots <- plot_grid(plotLU,plotHab,plotAge,plotPest,plotTEI_bl,plotTEI_delta,
-                   nrow = 3,ncol = 2)
+plots <- plot_grid(plotHab,plotAge,plotPest,plotTEI_bl,plotTEI_delta,
+                   nrow = 3,ncol = 2,labels =c("a)","b)","c)","d)","e)"),
+                   label_x = -0.02,label_size = 12,label_fontface = "plain")
+
 save_plot(filename = paste0(outDir,"ConditionalEffects.png"),
           plot = plots,ncol = 2,nrow = 3,
-          base_height = 7/2.54,base_width = 8.5/2.54)
+          base_height = 7.3333/2.54,base_width = 8.75/2.54)
 
 t.end <- Sys.time()
 
