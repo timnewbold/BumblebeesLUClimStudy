@@ -278,7 +278,7 @@ forestPlot
 The presence or absence of bumblebee species in both natural habitats and areas of human-modified land use is shaped strongly by habitat characteristics of the surrounding landscape. The availability of natural habitat in the landscape had a signifcant positive effect on probability of occurrence in human-modified land use, but no clear effect within natural habitats (Figure \@ref(fig:figmodeleffects)a). In both local land-use types, bumblebees are more likely to occur in landscapes that have been substantially converted to human land use for a shorter length of time (Figure \@ref(fig:figmodeleffects)b).
 
 <!-- PLOTTING: Model conditional effects -->
-```{r figmodeleffects, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=22/2.54,out.width="100%", fig.cap="**Conditional modelled effects of landscape natural habitat (a), duration of landscape modification (b), pesticide toxicity (c), baseline thermal niche position (d) and change in thermal niche position from climate change (e) on the probability of occurrence of bumblebee species**"}
+```{r figmodeleffects, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=22/2.54,out.width="100%", dpi=1200, fig.cap="**Conditional modelled effects of landscape natural habitat (a), duration of landscape modification (b), pesticide toxicity (c), baseline thermal niche position (d) and change in thermal niche position from climate change (e) on the probability of occurrence of bumblebee species**"}
 
 #### Plotting (natural habitat) ####
 
@@ -565,7 +565,7 @@ lu.means.upper.67 <- tapply(X = y.upper.67,INDEX = nd.obs$LandUse,FUN = median)
 
 Using the models to infer bumblebee probability of occurrence at the sampled sites, compared to the probability under hypothetical baseline conditions (100% landscape natural habitat, no history of human land use, no application of agricultural chemicals, and no climate change), we estimate that bumblebee probability of occurrence has been reduced by `r -round(lu.means.median['Natural'],0)`% (95% CI: `r -round(lu.means.upper.95['Natural'],0)`% &ndash; `r -round(lu.means.lower.95['Natural'],0)`%) across sampled natural habitats, and by `r -round(lu.means.median['Human'],0)`% (95% CI: `r -round(lu.means.upper.95['Human'],0)`% &ndash; `r -round(lu.means.lower.95['Human'],0)`%) across sampled human land uses (Figure \@ref(fig:figpredssites)).
 
-```{r figpredssites, echo=FALSE, warning=FALSE, fig.width=17.5, fig.height=7,out.width="100%", fig.cap="**Model-inferred differences in average bumblebee probability of occurrence at sampled sites in natural (primary and secondary) habitats and human-modified (agricultural and urban) habitats, compared to hypothetical baseline conditions (natural land use across the whole landscape, no human land-use history, no agricultural chemical application, and no climate change)**. Predictions were generated for every species recorded at each sampled site across both natural and human-modified habitats, based on the values of the explanatory variables as estimated for the sampled sites. Points show the median prediction, while thick and thin error bars, respectively, represent the 67% and 95% confidence intervals. Predictions capture both model and parameter uncertainty, by drawing 1000 sets of estimates both across models (weighted by AIC weight), and within sampled models according to the modelled uncertainty in the parameter estimates"}
+```{r figpredssites, echo=FALSE, warning=FALSE, fig.width=12.5/2.54, fig.height=13/2.54,out.width="60%", dpi=1200, fig.cap="**Model-inferred differences in average bumblebee probability of occurrence at sampled sites in natural (primary and secondary) habitats and human-modified (agricultural and urban) habitats, compared to hypothetical baseline conditions (natural land use across the whole landscape, no human land-use history, no agricultural chemical application, and no climate change)**. Predictions were generated for every species recorded at each sampled site across both natural and human-modified habitats, based on the values of the explanatory variables as estimated for the sampled sites. Points show the median prediction, while thick and thin error bars, respectively, represent the 67% and 95% confidence intervals. Predictions capture both model and parameter uncertainty, by drawing 1000 sets of estimates both across models (weighted by AIC weight), and within sampled models according to the modelled uncertainty in the parameter estimates"}
 
 # Average predicted differences in occurrence probability across sampled sites
 y.median.sites <- tapply(X = y.median,INDEX = nd.obs$SSBS,FUN = mean)
@@ -591,9 +591,12 @@ predsMap <- st_as_sf(predsMap)
 # Plot base map and predictions for sampled locations
 mapPreds <- ggplot() + geom_sf(data = baseMap,fill = "#ffffff") + 
   geom_sf(data=predsMap,mapping = aes(colour=y)) + 
-  scale_color_continuous(type = "viridis") + 
+  scale_color_continuous("\u0394 Probability of\noccurrence (%)",type = "viridis") + 
   scale_x_continuous(limits = c(-180,60)) + 
-  theme_classic()
+  theme_classic() + 
+  theme(axis.text = element_text(size = 10),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size=10))
 
 # Create error-bar plot showing predictions at sampled locations
 # by land-use type
@@ -615,11 +618,13 @@ plotLU <- ggplot() +
   geom_hline(mapping = aes(yintercept = 0),
              alpha = 0.3, linetype = 'dashed') +
   theme_classic() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12))
 
 # Create final figure
-plots <- cowplot::plot_grid(mapPreds,plotLU,nrow = 1,ncol = 2,
-                   rel_widths = c(0.6,0.4))
+plots <- cowplot::plot_grid(mapPreds,plotLU,nrow = 2,ncol = 1,
+                   rel_heights = c(0.4,0.6),rel_widths = c(1,0.1))
 plots
 ```
 

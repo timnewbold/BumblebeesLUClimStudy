@@ -77,12 +77,13 @@ nd.bl$TEI_delta <- 0
 # Extract observed data-frame
 nd.obs <- modelData
 
-cl <- makeCluster(detectCores()-1)
+# cl <- makeCluster(detectCores()-1)
+cl <- makeCluster(2)
 clusterExport(cl = cl,list = c("finalModel","nd.bl","nd.obs"))
 
 # Make 1,000 predictions of % difference between observed
 # and baseline conditions
-preds <- parSapply(cl = cl,X = 1:1000,FUN = function(i){
+preds <- parSapply(cl = cl,X = 1:10,FUN = function(i){
   
   # Draw one of the posterior parameter estimates at random
   i <- sample(x = 1:4000,size = 1,replace = FALSE)
@@ -168,9 +169,12 @@ predsMap <- st_as_sf(predsMap)
 # Plot base map and predictions for sampled locations
 mapPreds <- ggplot() + geom_sf(data = baseMap,fill = "#ffffff") + 
   geom_sf(data=predsMap,mapping = aes(colour=y)) + 
-  scale_color_continuous(type = "viridis") + 
+  scale_color_continuous("\u0394 Probability of\noccurrence (%)",type = "viridis") + 
   scale_x_continuous(limits = c(-180,60)) + 
-  theme_classic()
+  theme_classic() + 
+  theme(axis.text = element_text(size = 10),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size=10))
 
 # Create error-bar plot showing predictions at sampled locations
 # by land-use type
@@ -192,13 +196,16 @@ plotLU <- ggplot() +
   geom_hline(mapping = aes(yintercept = 0),
              alpha = 0.3, linetype = 'dashed') +
   theme_classic() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12))
 
 # Create final figure
-plots <- cowplot::plot_grid(mapPreds,plotLU,nrow = 1,ncol = 2,
-                   rel_widths = c(0.6,0.4))
+plots <- cowplot::plot_grid(mapPreds,plotLU,nrow = 2,ncol = 1,
+                   rel_heights = c(0.4,0.6),rel_widths = c(1,0.1))
 save_plot(filename = paste0(outDir,"EstimatedBiodiversityDifferences.png"),
-          plot = plots,ncol = 2,nrow = 1,base_width = 17/2.54,base_height = 8.5/2.54)
+          plot = plots,ncol = 1,nrow = 2,base_width = 12.5/2.54,
+          base_height = 6.5/2.54)
 
 t.end <- Sys.time()
 
