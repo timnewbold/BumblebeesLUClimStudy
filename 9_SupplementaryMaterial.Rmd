@@ -28,11 +28,20 @@ set.seed(1234)
 
 <!-- SETUP: read data and models -->
 ```{r,echo=FALSE,results=FALSE,warning=FALSE}
+# Load required packages
+suppressMessages(suppressWarnings(library(terra)))
+suppressMessages(suppressWarnings(library(brms)))
+suppressMessages(suppressWarnings(library(Hmisc)))
+suppressMessages(suppressWarnings(library(ggplot2)))
+suppressMessages(suppressWarnings(library(ggstance)))
+suppressMessages(suppressWarnings(library(cowplot)))
+suppressMessages(suppressWarnings(library(sf)))
+suppressMessages(suppressWarnings(library(snow)))
+suppressMessages(suppressWarnings(library(parallel)))
+
 # Set input directories
 dataDir <- "2_PrepareDiversityData/"
 modelsDir <- "3_RunModels/"
-bestModelDir <- "6_RefitBestModel/"
-mcmcModelDir <- "7_FitMCMCModel/"
 
 # Load the compiled species-level data
 diversity <- readRDS(paste0(dataDir,"diversity_data.rds"))
@@ -44,14 +53,11 @@ sites <- readRDS(paste0(modelsDir,"AnalysisSites.rds"))
 # Set input directory
 inDir <- "3_RunModels/"
 
-# Load required packages
-suppressMessages(suppressWarnings(library(StatisticalModels)))
-
 # Log-transform elevation, which is very skewed
 diversity$LogElevation <- log(diversity$Elevation+2)
 
-# Log-transform fertilizer application, which is also very skewed
-diversity$LogFertilizer <- log(diversity$Fertilizer+1)
+# Log-transform pesticide application, which is also very skewed
+diversity$LogPestToxLow <- log(diversity$PestToxLow+1)
 
 diversity$UI <- paste(diversity$LandUse,diversity$Use_intensity,sep="_")
 diversity$UI[grepl("Natural",diversity$UI)] <- "Natural"
@@ -65,15 +71,14 @@ modelData <- diversity[,c('occur','LandUse','TEI_BL',
                           'TEI_delta','LogElevation','SS','SSBS',
                           'Taxon_name_entered','Longitude','Latitude',
                           'Best_guess_binomial','Country',
-                          'Pesticide','LogFertilizer',
-                          'NaturalHabitat','AgeConv')]
+                          'LogPestToxLow',
+                          'NaturalHabitat2k','AgeConv')]
+
 # Remove rows with any NA values
 modelData <- na.omit(modelData)
 
 # Load the final model
-finalModels <- readRDS(paste(inDir,"FinalModels.rds",sep=""))
-
-bestModel <- readRDS(paste0(bestModelDir,"BestModel.Rds"))
+finalModel <- readRDS(paste0(inDir,"FinalModelBRMS.rds"))
 ```
 
 # Sites in Analysis
@@ -83,11 +88,27 @@ bestModel <- readRDS(paste0(bestModelDir,"BestModel.Rds"))
 <!-- PLOTTING: Plot map of sites included in analysis -->
 ```{r figsitesmap, echo=FALSE, warning=FALSE, fig.width=17, fig.height=12, out.width="100%", fig.cap="**Location of sites used in the analysis**. Base map shows the UN sub-regions from which bumblebee data were obtained: Northern America, Central America, Northern Europe, Western Europe and Southern Europe. Note that Mexico is classed within Central America in the UN sub-region scheme. Map is plotted with geographical coordinates using the WGS 1984 datum"}
 
-par(cex=2)
-
-suppressMessages(suppressWarnings(library(rgdal)))
-
 dataDir <- "0_data/"
+
+# Create basemap for North American and Western European sub-regions
+baseMap <- vect("0_data/UN_subregion.shp")
+baseMap <- terra::subset(baseMap,baseMap$SUBREGION %in% c(21,13,154,155,39))
+baseMap <- st_as_sf(baseMap)
+
+# Create map of the sites sampled in PREDICTS
+sitesMap <- vect(x = sites,geom=c("Longitude","Latitude"),
+                 crs = '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
+
+sitesMap <- st_as_sf(sitesMap)
+
+# Plot base map and overlaid with sampled sites
+mapPreds <- ggplot() + geom_sf(data = baseMap,fill = "#ffffff") + 
+  geom_sf(data=sitesMap,colour = "#ff0000") +
+  scale_x_continuous(limits = c(-180,60)) + 
+  theme_classic() + 
+  theme(axis.text = element_text(size = 10),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size=10))
 
 # Make map of sites
 occMap <- SpatialPointsDataFrame(coords = data.frame(x=sites$Longitude,
@@ -118,8 +139,6 @@ plot(occMap,add=TRUE,pch=16,cex=0.5,col="#cc0000")
 
 <!-- PLOTTING: model diagnostic checks -->
 ```{r diagnostic,echo=FALSE,results=FALSE,warning=FALSE, fig.width=8.5, fig.height=8,out.width="50%", fig.cap="**Q-Q plot of scaled model residuals compared to the expected distribution of residuals**. This plot was produced directly from the DHARMa R package Version 0.4.6"}
-suppressMessages(suppressWarnings(library(DHARMa)))
-suppressMessages(suppressWarnings(library(StatisticalModels)))
 
 simResids <- simulateResiduals(finalModels[[17]])
 
