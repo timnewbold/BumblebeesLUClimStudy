@@ -60,7 +60,7 @@ modelData <- na.omit(modelData)
 # Load the final model
 finalModel <- readRDS(paste0(inDir,"FinalModelBRMS.rds"))
 
-draws <- as_draws_df(finalModel)[,2:15]
+draws <- as_draws_df(finalModel)[,3:15]
 
 draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
 draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
