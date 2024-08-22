@@ -125,9 +125,9 @@ Information on habitat condition in the landscapes surrounding sampled sites com
 
 To calculate pesticide toxicity, we used modelled estimates of the density (kg/ha) of application of the 20 dominant pesticide active ingredients for each of 6 individual crops (corn, soyabean, wheat, cotton, rice, and alfalfa) or 4 crop groups (vegetables and fruit, orchards and grapes, pasture and hay, and other crops) &ndash; a total of 95 different active ingredients across all crops [@Maggi2019]. These data are presented on a 5-arc-minutes (approximately 10 km at the Equator) global spatial grid. We used the low rather than high modelled estimates from this dataset in the model presented in the main text, to be conservative, but run a supplementary model to test the robustness of our models to using the high estimates instead. Estimates of application density for each pesticide active ingredient were divided by estimates of LD50 for that chemical, derived from the Pesticide Properties Database [@Lewis2016], using estimates for honeybees, since this database doesn't record toxicity specifically for bumblebees. We used estimates of contact LD50s where available (87/95 active ingredients), and oral LD50s otherwise (4 active ingredients). For 4 out of 95 pesticide active ingredients where neither a contact nor an oral LD50 was available for honeybees, we excluded that pesticide from the calculations. We then summed the toxicity estimates across all dominant active ingredients for each of the 10 crops/crop groups (i.e., across 200 toxicity maps in total).
 
-For information on species temperature niche properties, we used previously published methods and associated records of bumblebee occurrence [@Soroye2020]. Specifically, we estimated: 1) the position of a population within the species' realized thermal niche, by estimating how the temperatures experienced by the population relate to the realized temperature niche of the species in a baseline period before the onset of rapid climate changes (1901 &mdash; 1975); and 2) how changes in temperature caused by climate change between the baseline period and a more recent period (2000 &mdash; 2014) have shifted the position of the population within this realized thermal niche. Realized temperature niche limits were estimated for each species as the mean of the five lowest minimum monthly temperatures and the mean of the five highest maximum monthly temperatures across all bumblebee spatial records in the baseline period (from an extensive database of species occurrence records across Western Europe and North America; see [@Soroye2020] for details). To measure the position of each species' population within the realized therml niche in either the baseline or recent period, we then derived the maximum monthly temperatures for all twelve months in each baseline or recent year. These maximum monthly temperatures were rescaled such that a value of 0 equates to the minimum realized temperature niche limit of the species, and a value of 1 to the maximum niche limit. We then averaged the 12 (rescaled) monthly values to derive the final mean niche position for each year. Finally, we averaged estimates across all years in either the baseline or recent period. Monthly minimum and maximum temperature estimates for the period 1901 to 2015 were obtained from the CRU global gridded climate reconstruction at 0.5&degree; spatial resolution, Version 3.24.01 [@CRU32401], which was the most recent version of this dataset available at the time of calculation [@Soroye2020]. Because our study area encompasses regions well covered by weather stations, the CRU estimates of temperature for the sites in our analysis were all derived from data from a minimum of 22 weather stations at the beginning of the baseline period (January 1901), and 31 at the end of the recent period (December 2014). 
+For information on species temperature niche properties, we used previously published methods and associated records of bumblebee occurrence [@Soroye2020]. Specifically, we estimated: 1) the position of a population within the species' realized thermal niche, by estimating how the temperatures experienced by the population relate to the realized temperature niche of the species in a baseline period before the onset of rapid climate changes (1901 &mdash; 1975); and 2) how changes in temperature caused by climate change between the baseline period and a more recent period (2000 &mdash; 2014) have shifted the position of the population within this realized thermal niche. Realized temperature niche limits were estimated for each species as the mean of the five lowest minimum monthly temperatures and the mean of the five highest maximum monthly temperatures across all bumblebee spatial records in the baseline period (from an extensive database of species occurrence records across Western Europe and North America; see [@Soroye2020] for details). To measure the position of each species' population within the realized thermal niche in either the baseline or recent period, we then derived the maximum monthly temperatures for all twelve months in each baseline or recent year. These maximum monthly temperatures were rescaled such that a value of 0 equates to the minimum realized temperature niche limit of the species, and a value of 1 to the maximum niche limit. We then averaged the 12 (rescaled) monthly values to derive the final mean niche position for each year. Finally, we averaged estimates across all years in either the baseline or recent period. A temperature niche position value of 0 represents a population at the lower limit of the species’ realized temperature niche, while a value of 1 represents a population at the upper limit of the species’ realized temperature niche. Monthly minimum and maximum temperature estimates for the period 1901 to 2015 were obtained from the CRU global gridded climate reconstruction at 0.5&degree; spatial resolution, Version 3.24.01 [@CRU32401], which was the most recent version of this dataset available at the time of calculation [@Soroye2020]. Because our study area encompasses regions well covered by weather stations, the CRU estimates of temperature for the sites in our analysis were all derived from data from a minimum of 22 weather stations at the beginning of the baseline period (January 1901), and 31 at the end of the recent period (December 2014). 
 
-To control for potential confounding effects of elevation, we also included in the model estimates of elevation at 30-arc-second spatial resolution, obtained from WorldClim Version 2.1 [@Fick2017].
+To control for potential confounding effects of elevation, we also included in the model estimates of elevation at 30-arc-second spatial resolution, obtained from WorldClim Version 2.1 [@Fick2017]. All spatial data manipulation was carried out using the terra R package Version 1.7-71 [@Hijmans2024].
 
 ## Statistical Analysis
 
@@ -135,7 +135,7 @@ To analyse the presence or absence of bumblebee species at the sampled locations
 
 $$Occurrence \sim LandUse + NaturalHabitat + PesticideToxicity + LandscapeModificationDuration + poly(BaselineThermalNichePosition,2) + DeltaThermalNichePosition + LandUse:NaturalHabitat + LandUse:PesticideToxicity + LandUse:LandscapeModificationDuration + LandUse:poly(BaselineThermalNichePosition,2) + LandUse:DeltaThermalNichePosition + (1|SS) + (1|SSBS) + (1|TaxonName)$$
 
-Where 'poly(BaselineThermalPosition,2)' denotes the fitting of a quadratic polynomial term, 'SS' denotes study identity, and 'SSBS' denotes site identity (nested within study). All models were implemented in the brms R package Version 2.21.0 [@Burkner2021]. All parameters took the default, weakly informative priors. We ran 4 chains, and assessed convergence by inspection of Rhat values. Chains were run with a burn-in of 1,000 iterations and a sampling period of 1,000 iterations. For comparison, we also built a model containing just land use as a fixed effect. Model explanatory power was assessed using a version of R^2^ values designed for Bayesian models [@Gelman2019]. Collinearity among the explanatory variables included in the models was not high enough to cause major biases in the modelling (Pearson's correlation coefficient, r < 0.55). We tested for spatial autocorrelation across all of the residuals of the final model, and in the residuals associated with each underlying study using Moran’s tests, implemented in the spdep package Version 1.2-8.
+Where 'poly(BaselineThermalPosition,2)' denotes the fitting of a quadratic polynomial term, 'SS' denotes study identity, and 'SSBS' denotes site identity (nested within study). All models were implemented in the brms R package Version 2.21.0 [@Burkner2021]. All parameters took the default, weakly informative priors. We ran 4 chains, and assessed convergence by inspection of Rhat values. Chains were run with a burn-in of 1,000 iterations and a sampling period of 1,000 iterations. For comparison, we also built a model containing just land use as a fixed effect. Model explanatory power was assessed using a version of R^2^ values designed for Bayesian models [@Gelman2019], calculated using the bayes_R2 function of the brms R package Version  2.21.0 [@Burkner2021]. Collinearity among the explanatory variables included in the models was not high enough to cause major biases in the modelling (Pearson's correlation coefficient, r < 0.55). We tested for spatial autocorrelation across all of the residuals of the final model, and in the residuals associated with each underlying study using Moran’s tests, implemented in the spdep package Version 1.2-8.
 
 To reveal the impacts that environmental changes to date have had on bumblebee occurrence probability across both natural habitats and human-modified habitats, we used our model to infer biodiversity changes across the sampled sites, based on the values of the model explanatory variables at those sites at the time of biodiversity sampling. These estimates thus included the impacts on both natural and modified habitats of climate change, and the modification of landscapes by human land use. Estimates of biodiversity at the time of sampling were expressed as a percentage difference compared to predictions under a baseline condition in which we assumed that landscapes were entirely composed of natural habitat, with no history of human modification, subject to no application of pesticides, and with no change in climate. To derive model-estimated differences between baseline and contemporary conditions, with uncertainty, we drew 1,000 sets of coefficient estimates from the posterior samples of the model. Each of these coefficient estimates was used to estimate average bumblebee probability of occurrence under both baseline and contemporary environmental conditions, from which we calculated 1,000 estimates of the percentage difference in average occurrence probability between baseline and contemporary conditions.
 
@@ -212,7 +212,7 @@ max.rhat <- max(summary(finalModel)$fixed$Rhat)
 Availability of natural habitat in the landscape, cumulative pesticide toxicity, land-use history, climatic niche properties and climate change all made a substantial contribution to explaining bumblebee occurrence probability, with effects strongly dependent on local land use (Figure \@ref(fig:figforest)). A model containing just local land use explained only a very small proportion of the variation in bumblebee occurrence (R^2^~marginal~ = `r r2.lu.mod.marg`; R^2^~conditional~ = `r r2.lu.mod.cond`). The full model, containing all of the candidate fixed effects, explained substantially more of the variation in bumblebee occurrence (R^2^~marginal~ = `r r2.marginal`; R^2^~conditional~ = `r r2.conditional`). In the full model, local land use had a negliglble effect on bumblebee probability of occurrence, but crucially played an important role in interaction with the other variables.
 
 <!-- PLOTTING: Forest plot -->
-```{r figforest, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**"}
+```{r figforest, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; red - realized thermal niche position and effect on this of climate change."}
 draws <- as_draws_df(finalModel)[,3:15]
 
 draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
@@ -279,24 +279,27 @@ forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
 forestPlot
 ```
 
-The presence or absence of bumblebee species in both natural habitats and areas of human-modified land use is shaped strongly by habitat characteristics of the surrounding landscape. The availability of natural habitat in the landscape had a signifcant positive effect on probability of occurrence in human-modified land use, but no clear effect within natural habitats (Figure \@ref(fig:figmodeleffects)a). In both local land-use types, bumblebees are more likely to occur in landscapes that have been substantially converted to human land use for a shorter length of time (Figure \@ref(fig:figmodeleffects)b).
+The probability of occurrence of bumblebee species in both natural habitats and areas of human-modified land use is shaped strongly by habitat characteristics of the surrounding landscape. The availability of natural habitat in the landscape had a signifcant positive effect on probability of occurrence in human-modified land use, but no clear effect within natural habitats (Figure \@ref(fig:figmodeleffects)a). In both local land-use types, bumblebees are more likely to occur in landscapes that have been substantially converted to human land use for a shorter length of time (Figure \@ref(fig:figmodeleffects)b).
 
 <!-- PLOTTING: Model conditional effects -->
-```{r figmodeleffects, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=22/2.54,out.width="100%", dpi=1200, fig.cap="**Conditional modelled effects of landscape natural habitat (a), duration of landscape modification (b), pesticide toxicity (c), baseline thermal niche position (d) and change in thermal niche position from climate change (e) on the probability of occurrence of bumblebee species**"}
+```{r figmodeleffects, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=22/2.54,out.width="100%", dpi=1200, fig.cap="**Conditional modelled effects of landscape natural habitat (a), duration of landscape modification (b), pesticide toxicity (c), baseline thermal niche position (d) and change in thermal niche position from climate change (e) on the probability of occurrence of bumblebee species**. In all panels, lines represent median estimates of conditional effects, dark shading represents the 67% credible intervals, and light shading the 95% credible intervals. Variables not being considered are held at fixed values to reflect landscapes with relatively low human impact: zero pesticide application (and thus toxicity), 75% landscape coverage of natural habitats, 50 years of substantial modification of landscapes for human use, zero climate change. Baseline thermal niche position and elevation are held at their median values."}
 
 #### Plotting (natural habitat) ####
 
-# Create data frame with variable values for which to predict occurrence probability
-# Set elevation and landscape age variables at their median
-# values (to reflect a 'typical' landscape)
-# Ignore pesticide toxicity for now (i.e., set to zero)
-# Set baseline TEI to the median value
-# Set delta TEI to zero (i.e. ignore climate change effects)
-nd <- data.frame(LogPestToxLow=0,
-                 AgeConv=median(modelData$AgeConv),
-                 LogElevation=median(modelData$LogElevation),
-                 TEI_BL=median(modelData$TEI_BL),
-                 TEI_delta=0)
+# Create data frame with variable values at which to estimate conditional effects
+# Estimate conditional effects separately for median values of the variables
+# in each land-use type
+nd <- expand.grid(LandUse=factor(c("Natural","Human"),levels=levels(modelData$LandUse)))
+nd$LogPestToxLow <- c(median(modelData$LogPestToxLow[modelData$LandUse=="Natural"]),
+                      median(modelData$LogPestToxLow[modelData$LandUse=="Human"]))
+nd$AgeConv <- c(median(modelData$AgeConv[modelData$LandUse=="Natural"]),
+                      median(modelData$AgeConv[modelData$LandUse=="Human"]))
+nd$LogElevation <- c(median(modelData$LogElevation[modelData$LandUse=="Natural"]),
+                      median(modelData$LogElevation[modelData$LandUse=="Human"]))
+nd$TEI_BL <- c(median(modelData$TEI_BL[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_BL[modelData$LandUse=="Human"]))
+nd$TEI_delta <- c(median(modelData$TEI_delta[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_delta[modelData$LandUse=="Human"]))
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "NaturalHabitat2k:LandUse",
@@ -306,14 +309,26 @@ preds.95 <- conditional_effects(x = finalModel,effects = "NaturalHabitat2k:LandU
                                 resolution = 1000,
                                 conditions = nd,plot = FALSE,prob=0.95)
 
+# Select only the prediction rows where other variables have median values
+# corresponding with the land-use type in question
+preds.67 <- rbind(preds.67$`NaturalHabitat2k:LandUse`[1:2000,]
+                  [preds.67$`NaturalHabitat2k:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.67$`NaturalHabitat2k:LandUse`[2001:4000,]
+                  [preds.67$`NaturalHabitat2k:LandUse`[2001:4000,]$LandUse=="Human",])
+preds.95 <- rbind(preds.95$`NaturalHabitat2k:LandUse`[1:2000,]
+                  [preds.95$`NaturalHabitat2k:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.95$`NaturalHabitat2k:LandUse`[2001:4000,]
+                  [preds.95$`NaturalHabitat2k:LandUse`[2001:4000,]$LandUse=="Human",])
+
+
 plotHab <- ggplot() + 
-  geom_ribbon(data = preds.95$`NaturalHabitat2k:LandUse`, 
+  geom_ribbon(data = preds.95, 
               mapping = aes(x = NaturalHabitat2k/10,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.2) + 
-  geom_ribbon(data = preds.67$`NaturalHabitat2k:LandUse`,
+  geom_ribbon(data = preds.67,
               mapping = aes(x = NaturalHabitat2k/10,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.4) + 
-  geom_line(data = preds.67$`NaturalHabitat2k:LandUse`,
+  geom_line(data = preds.67,
             mapping = aes(x = NaturalHabitat2k/10,y = estimate__,col = LandUse),
             linewidth = 1) + 
   scale_fill_manual(values = c("#009F81","#A40122")) + 
@@ -327,17 +342,20 @@ plotHab <- ggplot() +
 
 #### Plotting (landscape conversion age) ####
 
-# Create data frame with variable values for which to predict occurrence probability
-# Set elevation and natural habitat variables at their median
-# values (to reflect a 'typical' landscape)
-# Ignore pesticide toxicity for now (i.e., set to zero)
-# Set baseline TEI to the median value
-# Set delta TEI to zero (i.e. ignore climate change effects)
-nd <- data.frame(LogPestToxLow=0,
-                 NaturalHabitat2k=median(modelData$NaturalHabitat2k),
-                 LogElevation=median(modelData$LogElevation),
-                 TEI_BL=median(modelData$TEI_BL),
-                 TEI_delta=0)
+# Create data frame with variable values at which to estimate conditional effects
+# Estimate conditional effects separately for median values of the variables
+# in each land-use type
+nd <- expand.grid(LandUse=factor(c("Natural","Human"),levels=levels(modelData$LandUse)))
+nd$LogPestToxLow <- c(median(modelData$LogPestToxLow[modelData$LandUse=="Natural"]),
+                      median(modelData$LogPestToxLow[modelData$LandUse=="Human"]))
+nd$NaturalHabitat2k <- c(median(modelData$NaturalHabitat2k[modelData$LandUse=="Natural"]),
+                      median(modelData$NaturalHabitat2k[modelData$LandUse=="Human"]))
+nd$LogElevation <- c(median(modelData$LogElevation[modelData$LandUse=="Natural"]),
+                      median(modelData$LogElevation[modelData$LandUse=="Human"]))
+nd$TEI_BL <- c(median(modelData$TEI_BL[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_BL[modelData$LandUse=="Human"]))
+nd$TEI_delta <- c(median(modelData$TEI_delta[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_delta[modelData$LandUse=="Human"]))
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "AgeConv:LandUse",
@@ -347,14 +365,25 @@ preds.95 <- conditional_effects(x = finalModel,effects = "AgeConv:LandUse",
                                 resolution = 1000,
                                 conditions = nd,plot = FALSE,prob=0.95)
 
+# Select only the prediction rows where other variables have median values
+# corresponding with the land-use type in question
+preds.67 <- rbind(preds.67$`AgeConv:LandUse`[1:2000,]
+                  [preds.67$`AgeConv:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.67$`AgeConv:LandUse`[2001:4000,]
+                  [preds.67$`AgeConv:LandUse`[2001:4000,]$LandUse=="Human",])
+preds.95 <- rbind(preds.95$`AgeConv:LandUse`[1:2000,]
+                  [preds.95$`AgeConv:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.95$`AgeConv:LandUse`[2001:4000,]
+                  [preds.95$`AgeConv:LandUse`[2001:4000,]$LandUse=="Human",])
+
 plotAge <- ggplot() + 
-  geom_ribbon(data = preds.95$`AgeConv:LandUse`, 
+  geom_ribbon(data = preds.95, 
               mapping = aes(x = AgeConv,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.2) + 
-  geom_ribbon(data = preds.67$`AgeConv:LandUse`,
+  geom_ribbon(data = preds.67,
               mapping = aes(x = AgeConv,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.4) + 
-  geom_line(data = preds.67$`AgeConv:LandUse`,
+  geom_line(data = preds.67,
             mapping = aes(x = AgeConv,y = estimate__,col = LandUse),
             linewidth = 1) + 
   scale_fill_manual(values = c("#009F81","#A40122")) + 
@@ -369,16 +398,20 @@ plotAge <- ggplot() +
 
 #### Plotting (pesticide toxicity) ####
 
-# Create data frame with variable values for which to predict occurrence probability
-# Set elevation, natural habitat and landscape age variables at their median
-# values (to reflect a 'typical' landscape)
-# Set baseline TEI to the median value
-# Set delta TEI to zero (i.e. ignore climate change effects)
-nd <- data.frame(NaturalHabitat2k=median(modelData$NaturalHabitat2k),
-                 AgeConv=median(modelData$AgeConv),
-                 LogElevation=median(modelData$LogElevation),
-                 TEI_BL=median(modelData$TEI_BL),
-                 TEI_delta=0)
+# Create data frame with variable values at which to estimate conditional effects
+# Estimate conditional effects separately for median values of the variables
+# in each land-use type
+nd <- expand.grid(LandUse=factor(c("Natural","Human"),levels=levels(modelData$LandUse)))
+nd$AgeConv <- c(median(modelData$AgeConv[modelData$LandUse=="Natural"]),
+                      median(modelData$AgeConv[modelData$LandUse=="Human"]))
+nd$NaturalHabitat2k <- c(median(modelData$NaturalHabitat2k[modelData$LandUse=="Natural"]),
+                      median(modelData$NaturalHabitat2k[modelData$LandUse=="Human"]))
+nd$LogElevation <- c(median(modelData$LogElevation[modelData$LandUse=="Natural"]),
+                      median(modelData$LogElevation[modelData$LandUse=="Human"]))
+nd$TEI_BL <- c(median(modelData$TEI_BL[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_BL[modelData$LandUse=="Human"]))
+nd$TEI_delta <- c(median(modelData$TEI_delta[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_delta[modelData$LandUse=="Human"]))
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "LogPestToxLow:LandUse",
@@ -388,14 +421,25 @@ preds.95 <- conditional_effects(x = finalModel,effects = "LogPestToxLow:LandUse"
                                 resolution = 1000,
                                 conditions = nd,plot = FALSE,prob=0.95)
 
+# Select only the prediction rows where other variables have median values
+# corresponding with the land-use type in question
+preds.67 <- rbind(preds.67$`LogPestToxLow:LandUse`[1:2000,]
+                  [preds.67$`LogPestToxLow:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.67$`LogPestToxLow:LandUse`[2001:4000,]
+                  [preds.67$`LogPestToxLow:LandUse`[2001:4000,]$LandUse=="Human",])
+preds.95 <- rbind(preds.95$`LogPestToxLow:LandUse`[1:2000,]
+                  [preds.95$`LogPestToxLow:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.95$`LogPestToxLow:LandUse`[2001:4000,]
+                  [preds.95$`LogPestToxLow:LandUse`[2001:4000,]$LandUse=="Human",])
+
 plotPest <- ggplot() + 
-  geom_ribbon(data = preds.95$`LogPestToxLow:LandUse`, 
+  geom_ribbon(data = preds.95, 
               mapping = aes(x = exp(LogPestToxLow)-1,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.2) + 
-  geom_ribbon(data = preds.67$`LogPestToxLow:LandUse`,
+  geom_ribbon(data = preds.67,
               mapping = aes(x = exp(LogPestToxLow)-1,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.4) + 
-  geom_line(data = preds.67$`LogPestToxLow:LandUse`,
+  geom_line(data = preds.67,
             mapping = aes(x = exp(LogPestToxLow)-1,y = estimate__,col = LandUse),
             linewidth = 1) + 
   scale_fill_manual(values = c("#009F81","#A40122")) + 
@@ -407,19 +451,22 @@ plotPest <- ggplot() +
         axis.title = element_text(size = 12),
         axis.text = element_text(size = 10))
 
-
 #### Plotting (Baseline TEI) ####
 
-# Create data frame with variable values for which to predict occurrence probability
-# Set elevation, natural habitat, and landscape age variables at their median
-# values (to reflect a 'typical' landscape)
-# Ignore pesticide toxicity for now (i.e., set to zero)
-# Set delta TEI to zero (i.e. no climate change)
-nd <- data.frame(NaturalHabitat2k=median(modelData$NaturalHabitat2k),
-                 LogPestToxLow=0,
-                 AgeConv=median(modelData$AgeConv),
-                 LogElevation=median(modelData$LogElevation),
-                 TEI_delta=0)
+# Create data frame with variable values at which to estimate conditional effects
+# Estimate conditional effects separately for median values of the variables
+# in each land-use type
+nd <- expand.grid(LandUse=factor(c("Natural","Human"),levels=levels(modelData$LandUse)))
+nd$AgeConv <- c(median(modelData$AgeConv[modelData$LandUse=="Natural"]),
+                      median(modelData$AgeConv[modelData$LandUse=="Human"]))
+nd$NaturalHabitat2k <- c(median(modelData$NaturalHabitat2k[modelData$LandUse=="Natural"]),
+                      median(modelData$NaturalHabitat2k[modelData$LandUse=="Human"]))
+nd$LogElevation <- c(median(modelData$LogElevation[modelData$LandUse=="Natural"]),
+                      median(modelData$LogElevation[modelData$LandUse=="Human"]))
+nd$LogPestToxLow <- c(median(modelData$LogPestToxLow[modelData$LandUse=="Natural"]),
+                      median(modelData$LogPestToxLow[modelData$LandUse=="Human"]))
+nd$TEI_delta <- c(median(modelData$TEI_delta[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_delta[modelData$LandUse=="Human"]))
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "TEI_BL:LandUse",
@@ -429,14 +476,25 @@ preds.95 <- conditional_effects(x = finalModel,effects = "TEI_BL:LandUse",
                                 resolution = 1000,
                                 conditions = nd,plot = FALSE,prob=0.95)
 
+# Select only the prediction rows where other variables have median values
+# corresponding with the land-use type in question
+preds.67 <- rbind(preds.67$`TEI_BL:LandUse`[1:2000,]
+                  [preds.67$`TEI_BL:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.67$`TEI_BL:LandUse`[2001:4000,]
+                  [preds.67$`TEI_BL:LandUse`[2001:4000,]$LandUse=="Human",])
+preds.95 <- rbind(preds.95$`TEI_BL:LandUse`[1:2000,]
+                  [preds.95$`TEI_BL:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.95$`TEI_BL:LandUse`[2001:4000,]
+                  [preds.95$`TEI_BL:LandUse`[2001:4000,]$LandUse=="Human",])
+
 plotTEI_bl <- ggplot() + 
-  geom_ribbon(data = preds.95$`TEI_BL:LandUse`, 
+  geom_ribbon(data = preds.95, 
               mapping = aes(x = TEI_BL,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.2) + 
-  geom_ribbon(data = preds.67$`TEI_BL:LandUse`,
+  geom_ribbon(data = preds.67,
               mapping = aes(x = TEI_BL,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.4) + 
-  geom_line(data = preds.67$`TEI_BL:LandUse`,
+  geom_line(data = preds.67,
             mapping = aes(x = TEI_BL,y = estimate__,col = LandUse),
             linewidth = 1) + 
   scale_fill_manual(values = c("#009F81","#A40122")) + 
@@ -448,19 +506,22 @@ plotTEI_bl <- ggplot() +
         axis.title = element_text(size = 12),
         axis.text = element_text(size = 10))
 
-
 #### Plotting (delta TEI) ####
 
-# Create data frame with variable values for which to predict occurrence probability
-# Set elevation, natural habitat, and landscape age variables at their median
-# values (to reflect a 'typical' landscape)
-# Ignore pesticide toxicity for now (i.e., set to zero)
-# Set baseline TEI to the median value
-nd <- data.frame(NaturalHabitat2k=median(modelData$NaturalHabitat2k),
-                 LogPestToxLow=0,
-                 AgeConv=median(modelData$AgeConv),
-                 LogElevation=median(modelData$LogElevation),
-                 TEI_BL=median(modelData$TEI_BL))
+# Create data frame with variable values at which to estimate conditional effects
+# Estimate conditional effects separately for median values of the variables
+# in each land-use type
+nd <- expand.grid(LandUse=factor(c("Natural","Human"),levels=levels(modelData$LandUse)))
+nd$AgeConv <- c(median(modelData$AgeConv[modelData$LandUse=="Natural"]),
+                      median(modelData$AgeConv[modelData$LandUse=="Human"]))
+nd$NaturalHabitat2k <- c(median(modelData$NaturalHabitat2k[modelData$LandUse=="Natural"]),
+                      median(modelData$NaturalHabitat2k[modelData$LandUse=="Human"]))
+nd$LogElevation <- c(median(modelData$LogElevation[modelData$LandUse=="Natural"]),
+                      median(modelData$LogElevation[modelData$LandUse=="Human"]))
+nd$LogPestToxLow <- c(median(modelData$LogPestToxLow[modelData$LandUse=="Natural"]),
+                      median(modelData$LogPestToxLow[modelData$LandUse=="Human"]))
+nd$TEI_BL <- c(median(modelData$TEI_BL[modelData$LandUse=="Natural"]),
+                      median(modelData$TEI_BL[modelData$LandUse=="Human"]))
 
 # Get predicted values with both 67% (~ 1 SE) and 95% credible intervals
 preds.67 <- conditional_effects(x = finalModel,effects = "TEI_delta:LandUse",
@@ -470,14 +531,25 @@ preds.95 <- conditional_effects(x = finalModel,effects = "TEI_delta:LandUse",
                                 resolution = 1000,
                                 conditions = nd,plot = FALSE,prob=0.95)
 
+# Select only the prediction rows where other variables have median values
+# corresponding with the land-use type in question
+preds.67 <- rbind(preds.67$`TEI_delta:LandUse`[1:2000,]
+                  [preds.67$`TEI_delta:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.67$`TEI_delta:LandUse`[2001:4000,]
+                  [preds.67$`TEI_delta:LandUse`[2001:4000,]$LandUse=="Human",])
+preds.95 <- rbind(preds.95$`TEI_delta:LandUse`[1:2000,]
+                  [preds.95$`TEI_delta:LandUse`[1:2000,]$LandUse=="Natural",],
+                  preds.95$`TEI_delta:LandUse`[2001:4000,]
+                  [preds.95$`TEI_delta:LandUse`[2001:4000,]$LandUse=="Human",])
+
 plotTEI_delta <- ggplot() + 
-  geom_ribbon(data = preds.95$`TEI_delta:LandUse`, 
+  geom_ribbon(data = preds.95, 
               mapping = aes(x = TEI_delta,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.2) + 
-  geom_ribbon(data = preds.67$`TEI_delta:LandUse`,
+  geom_ribbon(data = preds.67,
               mapping = aes(x = TEI_delta,ymin = lower__,
                             ymax = upper__,fill = LandUse),alpha = 0.4) + 
-  geom_line(data = preds.67$`TEI_delta:LandUse`,
+  geom_line(data = preds.67,
             mapping = aes(x = TEI_delta,y = estimate__,col = LandUse),
             linewidth = 1) + 
   scale_fill_manual(values = c("#009F81","#A40122")) + 
@@ -648,7 +720,7 @@ Our results highlight the growing impacts on biodiversity from interactions amon
 
 Using our models to infer historical changes in bumblebee probability of occurrence suggests that modification of landscapes, combined with recent climate change, has reduced bumblebee biodiversity within natural habitats almost as much as in human-modified areas. While agricultural areas experience the direct impacts of habitat loss, many natural habitats are exposed to degradation of their surrounding landscapes, while both natural and human-modified areas are exposed to the effects of climate change. Land-use impacts are often quantified using spatial analyses, comparing sampled biodiversity between natural and modified areas [@Newbold2015]. The fact that natural habitats are composed of depauperate communities, heavily impacted by changes in their landscapes, means that such estimates are likely to underestimate land-use impacts substantially [@Newbold2019].
 
-Understanding changes in biodiversity through time using a spatial database of species records is inevitably subject to certain limitations. Most importantly, such an analysis does not permit a consideration of the dynamics of biodiversity change [@DePalma2018]. However, time-series data for insects are lacking in most regions. Another limitation is the reliance of large-scale studies on coarsely resolved estimates of the pressures on biodiversity. While the availability of fine-scale land-use/land-cover data has improved rapidly in recent years [@Jung2020], we still lack fine-scale estimates of the application of agricultural chemicals, a particularly important pressure on flying insect biodiversity [@Wagner2021]. To estimate the position of populations within species' temperature niches, we use information on species' realized distributions with respect to temperature. Such realized temperature limits may not correspond with the fundamental physiological limits of species, but estimates of the latter [@Bennett2018] are available for too few species to be useful in large-scale analyses. A previous study showed that realized thermal limits are clearly associated with occupancy change in response to recent climate change [@Soroye2020], suggesting these limits are ecologically important. Finally, all correlative analyses are unable to prove causal mechanisms. The complexity of the interactive effects we document highlights a need for more experimental studies or detailed field-level assessments to investigate the mechanistic basis for the patterns we report.
+Understanding changes in biodiversity through time using a spatial database of species records is inevitably subject to certain limitations. Most importantly, such an analysis does not permit a consideration of the dynamics of biodiversity change [@DePalma2018]. However, time-series data for insects are lacking in most regions. Second, there is likely to be important variation in responses among individual species [@Hemberger2021], but the database we used did not have sufficient sampling of individual species to permit a consideration of such variation here. Another limitation is the reliance of large-scale studies on coarsely resolved estimates of the pressures on biodiversity. While the availability of fine-scale land-use/land-cover data has improved rapidly in recent years [@Jung2020], we still lack fine-scale estimates of the application of agricultural chemicals, a particularly important pressure on flying insect biodiversity [@Wagner2021]. To estimate the position of populations within species' temperature niches, we use information on species' realized distributions with respect to temperature. Such realized temperature limits may not correspond with the fundamental physiological limits of species, but estimates of the latter [@Bennett2018] are available for too few species to be useful in large-scale analyses. A previous study showed that realized thermal limits are clearly associated with occupancy change in response to recent climate change [@Soroye2020], suggesting these limits are ecologically important. Finally, all correlative analyses are unable to prove causal mechanisms. The complexity of the interactive effects we document highlights a need for more experimental studies or detailed field-level assessments to investigate the mechanistic basis for the patterns we report.
 
 In conclusion, we show that interactions between climate change, climatic niche position and land-use pressures (both contemporary and historical) drive rapid and substantial changes in bumblebee biodiversity across both natural habitats and human-modified land. Given the importance of bumblebees for pollinating wild plants [@Ollerton2017] and agricultural crops [@Pritchard2020], these changes are likely to have important effects on both natural ecosystems and on our ability to grow food. Mitigating further losses of bumblebee diversity, and potentially reversing past declines, will require strong mitigation of climate change combined with restoration of natural habitats. To predict future changes in biodiversity, including of bumblebees, we must account for the complex interaction of climate and land-use pressures that are currently affecting species.
 
