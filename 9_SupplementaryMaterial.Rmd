@@ -1,5 +1,5 @@
 ---
-title: Supplementary Material for 'Bumblebee occupancy responds to complex interactions between local and landscape land use, climatic niche properties and climate change'
+title: Supplementary Material for 'Bumblebee probability of occurrence responds to interactions between local and landscape land use, climatic niche properties and climate change'
 author: "Tim Newbold^1,\\*^, Jeremy Kerr^2^, Peter Soroye^2,&dagger;^, Jessica J. Williams^1^"
 output:
   bookdown::word_document2:
@@ -323,7 +323,7 @@ forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
 forestPlot
 ```
 
-```{r figforest_nathab5, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of landscape natural habitat at 5-km instead of 2-km spatial grain"}
+```{r figforestnathab5, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of landscape natural habitat at 5-km instead of 2-km spatial grain"}
 finalModel_nathab5 <- readRDS(paste0(modelsDirRobustness,"ModelNatHab5k.rds"))
 
 draws <- as_draws_df(finalModel_nathab5)[,3:15]
@@ -392,7 +392,7 @@ forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
 forestPlot
 ```
 
-```{r figforest_age10, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 10% instead of 30%"}
+```{r figforestage10, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 10% instead of 30%"}
 finalModel_age10 <- readRDS(paste0(modelsDirRobustness,"ModelAge10.rds"))
 
 draws <- as_draws_df(finalModel_age10)[,3:15]
@@ -461,7 +461,7 @@ forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
 forestPlot
 ```
 
-```{r figforest_age50, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 50% instead of 30%"}
+```{r figforestage50, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 50% instead of 30%"}
 finalModel_age50 <- readRDS(paste0(modelsDirRobustness,"ModelAge50.rds"))
 
 draws <- as_draws_df(finalModel_age50)[,3:15]
@@ -530,7 +530,7 @@ forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
 forestPlot
 ```
 
-```{r figforest_pesthigh, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 50% instead of 30%"}
+```{r figforestpesthigh, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 50% instead of 30%"}
 finalModel_pesthigh <- readRDS(paste0(modelsDirRobustness,"ModelPestHigh.rds"))
 
 draws <- as_draws_df(finalModel_pesthigh)[,3:15]
