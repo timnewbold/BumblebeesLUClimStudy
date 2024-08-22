@@ -123,15 +123,20 @@ mapPreds
 
 ```{r explVarsHists,echo=FALSE,warning=FALSE,results=FALSE,fig.width=16.5/2.54,fig.height=21.5/2.54,out.width="100%",dpi=1200,fig.cap="**Distributions of explanatory variables in the modelled data**"}
 
-histNatHab <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = NaturalHabitat2k/10),bins=10) + scale_x_continuous(name = "Natural Habitat (%)") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histNatHab <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = NaturalHabitat2k/10,fill=LandUse),
+                                        bins=10,position="dodge") + scale_x_continuous(name = "Natural Habitat (%)") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
 
-histAge <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = AgeConv),bins=10) + scale_x_continuous(name = "Duration of landscape conversion (yrs)") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histAge <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = AgeConv,fill=LandUse),
+                                     bins=10,position="dodge") + scale_x_continuous(name = "Duration of landscape conversion (yrs)") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
 
-histPest <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = exp(LogPestToxLow)-1)) + scale_x_continuous(name = "Pesticide toxicity") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histPest <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = exp(LogPestToxLow)-1,fill=LandUse),
+                                      bins=10,position="dodge") + scale_x_continuous(name = "Pesticide toxicity") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
 
-histTEIBL <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = TEI_BL),bins=10) + scale_x_continuous(name = "Baseline thermal position") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histTEIBL <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = TEI_BL,fill=LandUse),
+                                       bins=10,position="dodge") + scale_x_continuous(name = "Baseline thermal position") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
 
-histTEIDelta <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = TEI_delta),bins=10) + scale_x_continuous(name = "\u0394 thermal position") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histTEIDelta <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = TEI_delta,fill=LandUse),
+                                          bins=10,position="dodge") + scale_x_continuous(name = "\u0394 thermal position") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
 
 plots <- plot_grid(histNatHab,histAge,histPest,histTEIBL,histTEIDelta,
                    nrow = 3,ncol = 2)
