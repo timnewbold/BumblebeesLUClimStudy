@@ -83,6 +83,52 @@ modelData <- na.omit(modelData)
 finalModel <- readRDS(paste0(inDir,"FinalModelBRMS.rds"))
 ```
 
+<!-- Run spatial autocorrelation tests -->
+```{r, echo=FALSE,results=FALSE,eval=TRUE,warning=FALSE}
+
+modelData <- droplevels(modelData)
+
+siteAvgResids <- data.frame(resids=tapply(X = residuals(finalModel)[,1],
+                                          INDEX = modelData$SSBS,
+                                          FUN = mean))
+siteAvgResids$SSBS <- row.names(siteAvgResids)
+row.names(siteAvgResids) <- NULL
+siteAvgResids$Longitude <- modelData$Longitude[
+  match(siteAvgResids$SSBS,modelData$SSBS)]
+siteAvgResids$Latitude <- modelData$Latitude[
+  match(siteAvgResids$SSBS,modelData$SSBS)]
+siteAvgResids$SS <- modelData$SS[
+  match(siteAvgResids$SSBS,modelData$SSBS)]
+
+moran <- as.data.frame(t(sapply(X = as.character(unique(siteAvgResids$SS)),FUN = function(ss){
+  
+  data.sub <- droplevels(siteAvgResids[siteAvgResids$SS==ss,])
+  
+  ds.nb<-try(dnearneigh(cbind(data.sub$Longitude,data.sub$Latitude),
+                            d1=0.00000001,d2=10),silent=TRUE)
+  ds.listw<-try(nb2listw(ds.nb),silent=TRUE)
+  mt<-tryCatch(moran.test(data.sub$resids,ds.listw),silent=TRUE,error=function(e) e,
+               warning=function(w) w)
+  
+  if(class(mt)[1]=="htest"){
+        if ((!is.na(mt$statistic))){
+          return(data.frame(SS=ss,i=mt$statistic,p=mt$p.value))
+        } else {
+          return(data.frame(SS=ss,i=NA,p=NA))
+        }
+    
+  } else {
+    return(data.frame(SS=ss,i=NA,p=NA))
+  }
+  
+})))
+
+moran$SS <- as.character(moran$SS)
+moran$i <- as.numeric(moran$i)
+moran$p <- as.numeric(moran$p)
+
+```
+
 # Sites in Analysis
 
 <br />
@@ -121,22 +167,64 @@ mapPreds
 
 <br />
 
-```{r explVarsHists,echo=FALSE,warning=FALSE,results=FALSE,fig.width=16.5/2.54,fig.height=21.5/2.54,out.width="100%",dpi=1200,fig.cap="**Distributions of explanatory variables in the modelled data**"}
+```{r explVarsHists,echo=FALSE,warning=FALSE,results=FALSE,fig.width=16.5/2.54,fig.height=21.5/2.54,out.width="100%",dpi=1200,fig.cap="**Distributions of the records included in the analysis along the gradients of the explanatory variables**. Histograms are plotted separately for natural habitats (blue colour) and human-modified land uses (red colour). Black points indicate the position of records within studies that showed significant residual spatial autocorrelation in the final model"}
 
-histNatHab <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = NaturalHabitat2k/10,fill=LandUse),
-                                        bins=10,position="dodge") + scale_x_continuous(name = "Natural Habitat (%)") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+# In order to show position along explanatory variable gradients of studies with
+# significant spatial autocorrelation, set colour for points so that studies with
+# significant spatial autocorrelation plot as black, and all other points as fully
+# transparent white (i.e., invisible)
+modelData$PointCol <- "#ffffff00"
+modelData$PointCol[modelData$SS %in% moran$SS[which(moran$p<0.05)]] <- "#000000"
 
-histAge <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = AgeConv,fill=LandUse),
-                                     bins=10,position="dodge") + scale_x_continuous(name = "Duration of landscape conversion (yrs)") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histNatHab <- ggplot(data = modelData) + 
+  geom_histogram(mapping = aes(x = NaturalHabitat2k/10,fill=LandUse),
+                 bins=10,position="dodge") + 
+  geom_point(mapping = aes(x = NaturalHabitat2k/10,y = 7300),col = modelData$PointCol) + 
+  scale_x_continuous(name = "Natural Habitat (%)") + 
+  scale_y_continuous(name = "Frequency") + 
+  scale_fill_manual(values = c("#2F67B1","#BF2C23")) + 
+  theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + 
+  theme_classic()
 
-histPest <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = exp(LogPestToxLow)-1,fill=LandUse),
-                                      bins=10,position="dodge") + scale_x_continuous(name = "Pesticide toxicity") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histAge <- ggplot(data = modelData) + 
+  geom_histogram(mapping = aes(x = AgeConv,fill=LandUse),
+                 bins=10,position="dodge") + 
+  geom_point(mapping = aes(x = AgeConv,y = 7000),col = modelData$PointCol) + 
+  scale_x_continuous(name = "Duration of landscape conversion (yrs)") + 
+  scale_y_continuous(name = "Frequency") + 
+  scale_fill_manual(values = c("#2F67B1","#BF2C23")) + 
+  theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) +
+  theme_classic()
 
-histTEIBL <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = TEI_BL,fill=LandUse),
-                                       bins=10,position="dodge") + scale_x_continuous(name = "Baseline thermal position") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histPest <- ggplot(data = modelData) + 
+  geom_histogram(mapping = aes(x = exp(LogPestToxLow)-1,fill=LandUse),
+                 bins=10,position="dodge") + 
+  geom_point(mapping = aes(x = exp(LogPestToxLow)-1,y = 5800),col = modelData$PointCol) + 
+  scale_x_continuous(name = "Pesticide toxicity") + 
+  scale_y_continuous(name = "Frequency") + 
+  scale_fill_manual(values = c("#2F67B1","#BF2C23")) + 
+  theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) +
+  theme_classic()
 
-histTEIDelta <- ggplot() + geom_histogram(data = modelData,mapping = aes(x = TEI_delta,fill=LandUse),
-                                          bins=10,position="dodge") + scale_x_continuous(name = "\u0394 thermal position") + scale_y_continuous(name = "Frequency") + theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) + theme_classic()
+histTEIBL <- ggplot(data = modelData) + 
+  geom_histogram(mapping = aes(x = TEI_BL,fill=LandUse),
+                 bins=10,position="dodge") + 
+  geom_point(mapping = aes(x = TEI_BL,y = 5800),col = modelData$PointCol) + 
+  scale_x_continuous(name = "Baseline thermal position") + 
+  scale_y_continuous(name = "Frequency") + 
+  scale_fill_manual(values = c("#2F67B1","#BF2C23")) + 
+  theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) +
+  theme_classic()
+
+histTEIDelta <- ggplot(data = modelData) + 
+  geom_histogram(mapping = aes(x = TEI_delta,fill=LandUse),
+                 bins=10,position="dodge") + 
+  geom_point(mapping = aes(x = TEI_delta,y = 4600),col = modelData$PointCol) + 
+  scale_x_continuous(name = "\u0394 thermal position") + 
+  scale_y_continuous(name = "Frequency") + 
+  scale_fill_manual(values = c("#2F67B1","#BF2C23")) + 
+  theme(axis.title = element_text(size = 12),axis.text = element_text(size = 10)) +
+  theme_classic()
 
 plots <- plot_grid(histNatHab,histAge,histPest,histTEIBL,histTEIDelta,
                    nrow = 3,ncol = 2)
@@ -189,47 +277,6 @@ pp_check(finalModel,ndraws=100)
 <br /> 
 
 ```{r spatautocorrel,echo=FALSE,results=FALSE,warning=FALSE, fig.width=8.5, fig.height=7,out.width="50%", fig.cap="**Distribution of P values from a series of Moran's tests for spatial autocorrelation in the residuals associated with each individual study**. For each study, we calculated the average residual for each sampled site, and then ran a Moran's test for spatial autocorrelation in these average residuals. Moran's tests were performed using the spdep R package Version 1.2-8"}
-
-modelData <- droplevels(modelData)
-
-siteAvgResids <- data.frame(resids=tapply(X = residuals(finalModel)[,1],
-                                          INDEX = modelData$SSBS,
-                                          FUN = mean))
-siteAvgResids$SSBS <- row.names(siteAvgResids)
-row.names(siteAvgResids) <- NULL
-siteAvgResids$Longitude <- modelData$Longitude[
-  match(siteAvgResids$SSBS,modelData$SSBS)]
-siteAvgResids$Latitude <- modelData$Latitude[
-  match(siteAvgResids$SSBS,modelData$SSBS)]
-siteAvgResids$SS <- modelData$SS[
-  match(siteAvgResids$SSBS,modelData$SSBS)]
-
-moran <- as.data.frame(t(sapply(X = as.character(unique(siteAvgResids$SS)),FUN = function(ss){
-  
-  data.sub <- droplevels(siteAvgResids[siteAvgResids$SS==ss,])
-  
-  ds.nb<-try(dnearneigh(cbind(data.sub$Longitude,data.sub$Latitude),
-                            d1=0.00000001,d2=10),silent=TRUE)
-  ds.listw<-try(nb2listw(ds.nb),silent=TRUE)
-  mt<-tryCatch(moran.test(data.sub$resids,ds.listw),silent=TRUE,error=function(e) e,
-               warning=function(w) w)
-  
-  if(class(mt)[1]=="htest"){
-        if ((!is.na(mt$statistic))){
-          return(data.frame(SS=ss,i=mt$statistic,p=mt$p.value))
-        } else {
-          return(data.frame(SS=ss,i=NA,p=NA))
-        }
-    
-  } else {
-    return(data.frame(SS=ss,i=NA,p=NA))
-  }
-  
-})))
-
-moran$SS <- as.character(moran$SS)
-moran$i <- as.numeric(moran$i)
-moran$p <- as.numeric(moran$p)
 
 par(las=1)
 par(tck=-0.01)
