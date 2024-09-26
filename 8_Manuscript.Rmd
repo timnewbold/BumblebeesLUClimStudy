@@ -280,9 +280,22 @@ forestPlot
 The probability of occurrence of bumblebee species in both natural habitats and areas of human-modified land use is shaped strongly by habitat characteristics of the surrounding landscape. The availability of natural habitat in the landscape had a signifcant positive effect on probability of occurrence in human-modified land use, but no clear effect within natural habitats (Figure \@ref(fig:figmodeleffects)a). In both local land-use types, bumblebees are more likely to occur in landscapes that have been substantially converted to human land use for a shorter length of time (Figure \@ref(fig:figmodeleffects)b).
 
 <!-- PLOTTING: Model conditional effects -->
-```{r figmodeleffects, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=22/2.54,out.width="100%", dpi=1200, fig.cap="**Conditional modelled effects of landscape natural habitat (a), duration of landscape modification (b), pesticide toxicity (c), baseline thermal niche position (d) and change in thermal niche position from climate change (e) on the probability of occurrence of bumblebee species**. In all panels, lines represent median estimates of conditional effects, dark shading represents the 67% credible intervals, and light shading the 95% credible intervals. Variables not being considered are held at fixed values to reflect landscapes with relatively low human impact: zero pesticide application (and thus toxicity), 75% landscape coverage of natural habitats, 50 years of substantial modification of landscapes for human use, zero climate change. Baseline thermal niche position and elevation are held at their median values."}
+```{r figmodeleffects, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=22/2.54,out.width="100%", dpi=1200, fig.cap="**Conditional modelled effects of landscape natural habitat (a), duration of landscape modification (b), pesticide toxicity (c), baseline thermal niche position (d) and change in thermal niche position from climate change (e) on the probability of occurrence of bumblebee species**. In all panels, lines represent median estimates of conditional effects, dark shading represents the 67% credible intervals, and light shading the 95% credible intervals. Variables not being considered are held at their median values. Relationships are plotted for the central 95% of values sampled within each land use for each explanatory variable"}
+
+# Set the quantiles beyond which not to plot values un-represented in the
+# modelling data
+exclQuantiles <- c(0.025,0.975)
 
 #### Plotting (natural habitat) ####
+
+# Get the quantile values of forest cover for each land use beyond which to
+# exclude predictions not supported by the underlying data
+QNat <- quantile(x = modelData$NaturalHabitat2k[
+  modelData$LandUse=="Natural"],
+  probs = exclQuantiles)
+QHum <- quantile(x = modelData$NaturalHabitat2k[
+  modelData$LandUse=="Human"],
+  probs = exclQuantiles)
 
 # Create data frame with variable values at which to estimate conditional effects
 # Estimate conditional effects separately for median values of the variables
@@ -318,6 +331,30 @@ preds.95 <- rbind(preds.95$`NaturalHabitat2k:LandUse`[1:2000,]
                   preds.95$`NaturalHabitat2k:LandUse`[2001:4000,]
                   [preds.95$`NaturalHabitat2k:LandUse`[2001:4000,]$LandUse=="Human",])
 
+# Exclude extreme predictions not supported by the underlying data
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$NaturalHabitat2k < QNat[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$NaturalHabitat2k > QNat[2]))] <- NA
+
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$NaturalHabitat2k < QHum[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$NaturalHabitat2k > QHum[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$NaturalHabitat2k < QNat[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$NaturalHabitat2k > QNat[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$NaturalHabitat2k < QHum[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$NaturalHabitat2k > QHum[2]))] <- NA
+
+# Remove NA values from the predicted values
+preds.67 <- preds.67[!is.na(preds.67$estimate__),]
+preds.95 <- preds.95[!is.na(preds.95$estimate__),]
 
 plotHab <- ggplot() + 
   geom_ribbon(data = preds.95, 
@@ -339,6 +376,15 @@ plotHab <- ggplot() +
         axis.text = element_text(size = 10))
 
 #### Plotting (landscape conversion age) ####
+
+# Get the quantile values of forest cover for each land use beyond which to
+# exclude predictions not supported by the underlying data
+QNat <- quantile(x = modelData$AgeConv[
+  modelData$LandUse=="Natural"],
+  probs = exclQuantiles)
+QHum <- quantile(x = modelData$AgeConv[
+  modelData$LandUse=="Human"],
+  probs = exclQuantiles)
 
 # Create data frame with variable values at which to estimate conditional effects
 # Estimate conditional effects separately for median values of the variables
@@ -374,6 +420,31 @@ preds.95 <- rbind(preds.95$`AgeConv:LandUse`[1:2000,]
                   preds.95$`AgeConv:LandUse`[2001:4000,]
                   [preds.95$`AgeConv:LandUse`[2001:4000,]$LandUse=="Human",])
 
+# Exclude extreme predictions not supported by the underlying data
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$AgeConv < QNat[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$AgeConv > QNat[2]))] <- NA
+
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$AgeConv < QHum[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$AgeConv > QHum[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$AgeConv < QNat[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$AgeConv > QNat[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$AgeConv < QHum[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$AgeConv > QHum[2]))] <- NA
+
+# Remove NA values from the predicted values
+preds.67 <- preds.67[!is.na(preds.67$estimate__),]
+preds.95 <- preds.95[!is.na(preds.95$estimate__),]
+
 plotAge <- ggplot() + 
   geom_ribbon(data = preds.95, 
               mapping = aes(x = AgeConv,ymin = lower__,
@@ -395,6 +466,15 @@ plotAge <- ggplot() +
 
 
 #### Plotting (pesticide toxicity) ####
+
+# Get the quantile values of forest cover for each land use beyond which to
+# exclude predictions not supported by the underlying data
+QNat <- quantile(x = modelData$LogPestToxLow[
+  modelData$LandUse=="Natural"],
+  probs = exclQuantiles)
+QHum <- quantile(x = modelData$LogPestToxLow[
+  modelData$LandUse=="Human"],
+  probs = exclQuantiles)
 
 # Create data frame with variable values at which to estimate conditional effects
 # Estimate conditional effects separately for median values of the variables
@@ -430,6 +510,31 @@ preds.95 <- rbind(preds.95$`LogPestToxLow:LandUse`[1:2000,]
                   preds.95$`LogPestToxLow:LandUse`[2001:4000,]
                   [preds.95$`LogPestToxLow:LandUse`[2001:4000,]$LandUse=="Human",])
 
+# Exclude extreme predictions not supported by the underlying data
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$LogPestToxLow < QNat[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$LogPestToxLow > QNat[2]))] <- NA
+
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$LogPestToxLow < QHum[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$LogPestToxLow > QHum[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$LogPestToxLow < QNat[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$LogPestToxLow > QNat[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$LogPestToxLow < QHum[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$LogPestToxLow > QHum[2]))] <- NA
+
+# Remove NA values from the predicted values
+preds.67 <- preds.67[!is.na(preds.67$estimate__),]
+preds.95 <- preds.95[!is.na(preds.95$estimate__),]
+
 plotPest <- ggplot() + 
   geom_ribbon(data = preds.95, 
               mapping = aes(x = exp(LogPestToxLow)-1,ymin = lower__,
@@ -450,6 +555,15 @@ plotPest <- ggplot() +
         axis.text = element_text(size = 10))
 
 #### Plotting (Baseline TEI) ####
+
+# Get the quantile values of forest cover for each land use beyond which to
+# exclude predictions not supported by the underlying data
+QNat <- quantile(x = modelData$TEI_BL[
+  modelData$LandUse=="Natural"],
+  probs = exclQuantiles)
+QHum <- quantile(x = modelData$TEI_BL[
+  modelData$LandUse=="Human"],
+  probs = exclQuantiles)
 
 # Create data frame with variable values at which to estimate conditional effects
 # Estimate conditional effects separately for median values of the variables
@@ -485,6 +599,31 @@ preds.95 <- rbind(preds.95$`TEI_BL:LandUse`[1:2000,]
                   preds.95$`TEI_BL:LandUse`[2001:4000,]
                   [preds.95$`TEI_BL:LandUse`[2001:4000,]$LandUse=="Human",])
 
+# Exclude extreme predictions not supported by the underlying data
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$TEI_BL < QNat[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$TEI_BL > QNat[2]))] <- NA
+
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$TEI_BL < QHum[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$TEI_BL > QHum[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$TEI_BL < QNat[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$TEI_BL > QNat[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$TEI_BL < QHum[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$TEI_BL > QHum[2]))] <- NA
+
+# Remove NA values from the predicted values
+preds.67 <- preds.67[!is.na(preds.67$estimate__),]
+preds.95 <- preds.95[!is.na(preds.95$estimate__),]
+
 plotTEI_bl <- ggplot() + 
   geom_ribbon(data = preds.95, 
               mapping = aes(x = TEI_BL,ymin = lower__,
@@ -505,6 +644,15 @@ plotTEI_bl <- ggplot() +
         axis.text = element_text(size = 10))
 
 #### Plotting (delta TEI) ####
+
+# Get the quantile values of forest cover for each land use beyond which to
+# exclude predictions not supported by the underlying data
+QNat <- quantile(x = modelData$TEI_delta[
+  modelData$LandUse=="Natural"],
+  probs = exclQuantiles)
+QHum <- quantile(x = modelData$TEI_delta[
+  modelData$LandUse=="Human"],
+  probs = exclQuantiles)
 
 # Create data frame with variable values at which to estimate conditional effects
 # Estimate conditional effects separately for median values of the variables
@@ -540,6 +688,31 @@ preds.95 <- rbind(preds.95$`TEI_delta:LandUse`[1:2000,]
                   preds.95$`TEI_delta:LandUse`[2001:4000,]
                   [preds.95$`TEI_delta:LandUse`[2001:4000,]$LandUse=="Human",])
 
+# Exclude extreme predictions not supported by the underlying data
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$TEI_delta < QNat[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Natural") & 
+                            (preds.67$TEI_delta > QNat[2]))] <- NA
+
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$TEI_delta < QHum[1]))] <- NA
+preds.67$estimate__[which((preds.67$LandUse=="Human") & 
+                            (preds.67$TEI_delta > QHum[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$TEI_delta < QNat[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Natural") & 
+                            (preds.95$TEI_delta > QNat[2]))] <- NA
+
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$TEI_delta < QHum[1]))] <- NA
+preds.95$estimate__[which((preds.95$LandUse=="Human") & 
+                            (preds.95$TEI_delta > QHum[2]))] <- NA
+
+# Remove NA values from the predicted values
+preds.67 <- preds.67[!is.na(preds.67$estimate__),]
+preds.95 <- preds.95[!is.na(preds.95$estimate__),]
+
 plotTEI_delta <- ggplot() + 
   geom_ribbon(data = preds.95, 
               mapping = aes(x = TEI_delta,ymin = lower__,
@@ -570,7 +743,7 @@ plots
 
 Bumblebee occurrence probability is also influenced by the toxicity of pesticides applied in the landscape. In natural habitats, the probability of occurrence of bumblebees decreases strongly with pesticide toxicity, whereas in human-modified land uses there is a negligble effect (Figure \@ref(fig:figmodeleffects)c). Modelled effects of pesticide application rate were very similar when using either the low or high estimates of rates from the original dataset [@Maggi2019] (results not shown).
 
-Finally, bumblebee probability of occurrence is strongly influenced by the climatic niche properties of species, and the effects on these of recent climate change. Populations near the centre of the species' temperature  niche showed the greatest declines in probability of occurrence between natural and human-modified habitats, whereas for populations nearer the upper limit of the temperature niche, there was little difference in occurrence probability (Figure \@ref(fig:figmodeleffects)d). An increase in realized temperature niche position caused by climate warming had a weak negative effect on probability of occurrence in natural habitats (Figure \@ref(fig:figmodeleffects)e). In contrast, the effect of climate warming in human land uses was positive (Figure \@ref(fig:figmodeleffects)e).
+Finally, bumblebee probability of occurrence is strongly influenced by the climatic niche properties of species, and the effects on these of recent climate change. Populations near the centre of the species' temperature  niche showed the greatest declines in probability of occurrence between natural and human-modified habitats, whereas for populations nearer the upper limit of the temperature niche, there was little difference in occurrence probability (Figure \@ref(fig:figmodeleffects)d). An increase in realized temperature niche position caused by climate warming had a weak (and non-significant) negative effect on probability of occurrence in natural habitats (Figure \@ref(fig:figforest); Figure \@ref(fig:figmodeleffects)e). In contrast, the effect of climate warming in human land uses was positive (Figure \@ref(fig:figmodeleffects)e).
 
 The individual model chains converged well (all Rhat &le; `r max.rhat`; Figure SX). There was a good correspondence between the model posterior predicted values and observed records of bumblebee presence and absence (Figure SX). Overall, a Moran's test for spatial autocorrelation across all of the residuals of the final model did not reveal significant spatial autocorrelation (P = 0.94). However, there was significant spatial autocorrelation (P < 0.05) in the residuals associated with 9.1% of the underlying studies in the dataset, slightly higher than the 5% expected by chance. Importantly, the records from the studies with significant residual spatial autocorrelation did not occupy extreme positions along the range of any of the explanatory variables (Figure S2), and so there is unlikely to have been a substantial biasing effect on the model results. Results were very similar when the landscape availability of natural habitat was estimated at 1-km or 5-km instead of 2-km spatial grain (Figures SX & SX), and when using high instead of low estimates of cumulative pesticide toxicity (Figure SX). Estimates of the effect of duration of substantial habitat modification were weaker (although qualitatively unchanged) when substantial habitat modification was defined using a threshold of 10% or 50% conversion of landscapes to human-dominated land uses, rather than the 30% threshold used in the main text.
 
@@ -580,7 +753,7 @@ The individual model chains converged well (all Rhat &le; `r max.rhat`; Figure S
 
 # Create baseline data-frame with all natural land use, 100% surrounding natural
 # habitat (note that 100% is stored as 1,000), no pesticide and no climate change
-nd.bl <- modelData
+nd.bl <- droplevels(modelData)
 nd.bl$LandUse <- factor("Natural",levels=c("Natural","Human"))
 nd.bl$NaturalHabitat2k <- 1000
 nd.bl$LogPestToxLow <- 0
@@ -588,7 +761,7 @@ nd.bl$AgeConv <- 0
 nd.bl$TEI_delta <- 0
 
 # Extract observed data-frame
-nd.obs <- modelData
+nd.obs <- droplevels(modelData)
 
 # cl <- makeCluster(detectCores()-1)
 cl <- makeCluster(2)
@@ -639,7 +812,7 @@ lu.means.upper.67 <- tapply(X = y.upper.67,INDEX = nd.obs$LandUse,FUN = median)
 
 Using the models to infer bumblebee probability of occurrence at the sampled sites, compared to the probability under hypothetical baseline conditions (100% landscape natural habitat, no history of human land use, no application of agricultural chemicals, and no climate change), we estimate that bumblebee probability of occurrence has been reduced by `r -round(lu.means.median['Natural'],0)`% (95% CI: `r -round(lu.means.upper.95['Natural'],0)`% &ndash; `r -round(lu.means.lower.95['Natural'],0)`%) across sampled natural habitats, and by `r -round(lu.means.median['Human'],0)`% (95% CI: `r -round(lu.means.upper.95['Human'],0)`% &ndash; `r -round(lu.means.lower.95['Human'],0)`%) across sampled human land uses (Figure \@ref(fig:figpredssites)).
 
-```{r figpredssites, echo=FALSE, warning=FALSE, fig.width=12.5/2.54, fig.height=13/2.54,out.width="70%", dpi=1200, fig.cap="**Model-inferred differences in average bumblebee probability of occurrence at sampled sites in natural (primary and secondary) habitats and human-modified (agricultural and urban) habitats, compared to hypothetical baseline conditions (natural land use across the whole landscape, no human land-use history, no agricultural chemical application, and no climate change)**. Predictions were generated for every species recorded at each sampled site across both natural and human-modified habitats, based on the values of the explanatory variables as estimated for the sampled sites. Points show the median prediction, while thick and thin error bars, respectively, represent the 67% and 95% confidence intervals. Predictions capture both model and parameter uncertainty, by drawing 1000 sets of estimates both across models (weighted by AIC weight), and within sampled models according to the modelled uncertainty in the parameter estimates"}
+```{r figpredssites, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=16/2.54,out.width="100%", dpi=1200, fig.cap="**Model-inferred differences in average bumblebee probability of occurrence at sampled sites in natural (primary and secondary) habitats and human-modified (agricultural and urban) habitats, compared to hypothetical baseline conditions (natural land use across the whole landscape, no human land-use history, no agricultural chemical application, and no climate change)**. Predictions were generated for every species recorded at each sampled site across both natural and human-modified habitats, based on the values of the explanatory variables as estimated for the sampled sites. Points show the median prediction, while thick and thin error bars, respectively, represent the 67% and 95% confidence intervals. Predictions capture both model and parameter uncertainty, by drawing 1000 sets of estimates both across models (weighted by AIC weight), and within sampled models according to the modelled uncertainty in the parameter estimates"}
 
 # Average predicted differences in occurrence probability across sampled sites
 y.median.sites <- tapply(X = y.median,INDEX = nd.obs$SSBS,FUN = mean)
@@ -661,10 +834,12 @@ baseMap <- st_as_sf(baseMap)
 predsMap <- vect(x = sites,geom=c("Longitude","Latitude"),
                  crs = '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
 predsMap <- st_as_sf(predsMap)
+# Add column showing land use
+predsMap$LandUse <- modelData$LandUse[match(predsMap$SSBS,modelData$SSBS)]
 
 # Plot base map and predictions for sampled locations
 mapPreds <- ggplot() + geom_sf(data = baseMap,fill = "#ffffff") + 
-  geom_sf(data=predsMap,mapping = aes(colour=y)) + 
+  geom_sf(data=predsMap,mapping = aes(colour=y,shape=LandUse)) + 
   scale_color_continuous("\u0394 Probability of\noccurrence (%)",type = "viridis") + 
   scale_x_continuous(limits = c(-180,60)) + 
   theme_classic() + 
