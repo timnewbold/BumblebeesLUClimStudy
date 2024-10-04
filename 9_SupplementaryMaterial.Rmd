@@ -90,7 +90,7 @@ finalModel <- readRDS(paste0(inDir,"FinalModelBRMS.rds"))
 modelData <- droplevels(modelData)
 
 siteAvgResids <- data.frame(resids=tapply(X = residuals(finalModel)[,1],
-                                          INDEX = modelData$SSBS,
+                                          INDEX = droplevels(modelData)$SSBS,
                                           FUN = mean))
 siteAvgResids$SSBS <- row.names(siteAvgResids)
 row.names(siteAvgResids) <- NULL
