@@ -302,7 +302,435 @@ text(x=0.07,y=8,labels=paste0("Significant \nspatial \nautocorrelation \nin ",ro
 
 <br />
 
-```{r, figrelabundmodel, echo=FALSE,warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from a zero-inflated negative binomial model relating bumblebee relative abundance to land use, landscape habitat, pesticide toxicity and thermal niche properties**. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; red - realized thermal niche position and effect on this of climate change."}
+
+```{r figforestnathab1, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of landscape natural habitat at 1-km instead of 2-km spatial grain. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; light orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; dark orange - realized thermal niche position and effect on this of climate change. For the baseline thermal niche position, the ThermalPosition_Baseline and ThermalPosition_Baseline2 coefficients refer to the linear and quadratic components of the polynomial relationship, respectively, combined to describe the curivlinear relationship shown in Figure 2."}
+finalModel_nathab1 <- readRDS(paste0(modelsDirRobustness,"ModelNatHab1k.rds"))
+
+draws <- as_draws_df(finalModel_nathab1)[,3:15]
+
+draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
+draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
+draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
+draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
+draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
+
+draw.summary <- data.frame(Variable = names(draw.means),
+                           Mean = draw.means,
+                           Lower95 = draw.lower.95,
+                           Upper95 = draw.upper.95,
+                           Lower67 = draw.lower.67,
+                           Upper67 = draw.upper.67)
+
+draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
+draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
+draw.summary$Variable <- gsub("1k1","",draw.summary$Variable)
+draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
+draw.summary$Variable <- gsub("AgeConv1","ConversionDuration",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
+# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
+
+draw.summary$Variable <- factor(draw.summary$Variable,
+                                levels = c("LandUseHuman:ThermalPosition_Delta",
+                                           "ThermalPosition_Delta",
+                                           "LandUseHuman:ThermalPosition_Baseline2",
+                                           "LandUseHuman:ThermalPosition_Baseline",
+                                           "ThermalPosition_Baseline2",
+                                           "ThermalPosition_Baseline",
+                                           "LandUseHuman:ConversionDuration",
+                                           "ConversionDuration",
+                                           "LandUseHuman:PesticideToxicity",
+                                           "PesticideToxicity",
+                                           "LandUseHuman:NaturalHabitat",
+                                           "NaturalHabitat",
+                                           "LandUseHuman"))
+
+draw.summary$Group <- dplyr::recode(draw.summary$Variable,
+                                    "LandUseHuman" = "Land Use",
+                                    "NaturalHabitat" = "Natural Habitat",
+                                    "LandUseHuman:NaturalHabitat" = "Natural Habitat",
+                                    "PesticideToxicity" = "Pesticide Toxicity",
+                                    "LandUseHuman:PesticideToxicity" = "Pesticide Toxicity",
+                                    "ConversionDuration" = "Landscape Conversion Duration",
+                                    "LandUseHuman:ConversionDuration" = "Landscape Conversion Duration",
+                                    "ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "ThermalPosition_Delta" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Delta" = "Thermal Niche Properties")
+
+plotCols <- c("#D55E00","#F0E442","#E69F00","#009E73","#CC79A7")
+
+forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
+                                        xmin = draw.summary$Lower95, 
+                                        xmax = draw.summary$Upper95,
+                                        colour = draw.summary$Group)) + 
+  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
+                                 x = draw.summary$Mean,
+                                 xmin = draw.summary$Lower67,
+                                 xmax = draw.summary$Upper67,
+                                 colour = draw.summary$Group),
+                   fatten=1.8,size=1) +
+  scale_colour_manual(values = plotCols) +
+  geom_vline(mapping = aes(xintercept = 0)) +
+  labs(x = "Effect size",y = element_blank()) +
+  guides(colour = guide_legend(nrow = 3,reverse = TRUE,
+                               override.aes = aes(size=0.5))) + 
+  theme_classic() +
+  labs(colour = "Variable Group") + 
+  theme(legend.position = "bottom",
+        legend.direction = "vertical",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+  
+forestPlot
+```
+
+```{r figforestnathab5, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of landscape natural habitat at 5-km instead of 2-km spatial grain. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; light orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; dark orange - realized thermal niche position and effect on this of climate change. For the baseline thermal niche position, the ThermalPosition_Baseline and ThermalPosition_Baseline2 coefficients refer to the linear and quadratic components of the polynomial relationship, respectively, combined to describe the curivlinear relationship shown in Figure 2."}
+finalModel_nathab5 <- readRDS(paste0(modelsDirRobustness,"ModelNatHab5k.rds"))
+
+draws <- as_draws_df(finalModel_nathab5)[,3:15]
+
+draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
+draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
+draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
+draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
+draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
+
+draw.summary <- data.frame(Variable = names(draw.means),
+                           Mean = draw.means,
+                           Lower95 = draw.lower.95,
+                           Upper95 = draw.upper.95,
+                           Lower67 = draw.lower.67,
+                           Upper67 = draw.upper.67)
+
+draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
+draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
+draw.summary$Variable <- gsub("5k1","",draw.summary$Variable)
+draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
+draw.summary$Variable <- gsub("AgeConv1","ConversionDuration",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
+# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
+
+draw.summary$Variable <- factor(draw.summary$Variable,
+                                levels = c("LandUseHuman:ThermalPosition_Delta",
+                                           "ThermalPosition_Delta",
+                                           "LandUseHuman:ThermalPosition_Baseline2",
+                                           "LandUseHuman:ThermalPosition_Baseline",
+                                           "ThermalPosition_Baseline2",
+                                           "ThermalPosition_Baseline",
+                                           "LandUseHuman:ConversionDuration",
+                                           "ConversionDuration",
+                                           "LandUseHuman:PesticideToxicity",
+                                           "PesticideToxicity",
+                                           "LandUseHuman:NaturalHabitat",
+                                           "NaturalHabitat",
+                                           "LandUseHuman"))
+
+draw.summary$Group <- dplyr::recode(draw.summary$Variable,
+                                    "LandUseHuman" = "Land Use",
+                                    "NaturalHabitat" = "Natural Habitat",
+                                    "LandUseHuman:NaturalHabitat" = "Natural Habitat",
+                                    "PesticideToxicity" = "Pesticide Toxicity",
+                                    "LandUseHuman:PesticideToxicity" = "Pesticide Toxicity",
+                                    "ConversionDuration" = "Landscape Conversion Duration",
+                                    "LandUseHuman:ConversionDuration" = "Landscape Conversion Duration",
+                                    "ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "ThermalPosition_Delta" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Delta" = "Thermal Niche Properties")
+
+plotCols <- c("#D55E00","#F0E442","#E69F00","#009E73","#CC79A7")
+
+forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
+                                        xmin = draw.summary$Lower95, 
+                                        xmax = draw.summary$Upper95,
+                                        colour = draw.summary$Group)) + 
+  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
+                                 x = draw.summary$Mean,
+                                 xmin = draw.summary$Lower67,
+                                 xmax = draw.summary$Upper67,
+                                 colour = draw.summary$Group),
+                   fatten=1.8,size=1) +
+  scale_colour_manual(values = plotCols) +
+  geom_vline(mapping = aes(xintercept = 0)) +
+  labs(x = "Effect size",y = element_blank()) +
+  guides(colour = guide_legend(nrow = 3,reverse = TRUE,
+                               override.aes = aes(size=0.5))) + 
+  theme_classic() +
+  labs(colour = "Variable Group") + 
+  theme(legend.position = "bottom",
+        legend.direction = "vertical",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+  
+forestPlot
+```
+
+```{r figforestage10, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 10% instead of 30%. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; light orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; dark orange - realized thermal niche position and effect on this of climate change. For the baseline thermal niche position, the ThermalPosition_Baseline and ThermalPosition_Baseline2 coefficients refer to the linear and quadratic components of the polynomial relationship, respectively, combined to describe the curivlinear relationship shown in Figure 2."}
+finalModel_age10 <- readRDS(paste0(modelsDirRobustness,"ModelAge10.rds"))
+
+draws <- as_draws_df(finalModel_age10)[,3:15]
+
+draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
+draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
+draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
+draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
+draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
+
+draw.summary <- data.frame(Variable = names(draw.means),
+                           Mean = draw.means,
+                           Lower95 = draw.lower.95,
+                           Upper95 = draw.upper.95,
+                           Lower67 = draw.lower.67,
+                           Upper67 = draw.upper.67)
+
+draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
+draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
+draw.summary$Variable <- gsub("2k1","",draw.summary$Variable)
+draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
+draw.summary$Variable <- gsub("AgeConv101","ConversionDuration",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
+# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
+
+draw.summary$Variable <- factor(draw.summary$Variable,
+                                levels = c("LandUseHuman:ThermalPosition_Delta",
+                                           "ThermalPosition_Delta",
+                                           "LandUseHuman:ThermalPosition_Baseline2",
+                                           "LandUseHuman:ThermalPosition_Baseline",
+                                           "ThermalPosition_Baseline2",
+                                           "ThermalPosition_Baseline",
+                                           "LandUseHuman:ConversionDuration",
+                                           "ConversionDuration",
+                                           "LandUseHuman:PesticideToxicity",
+                                           "PesticideToxicity",
+                                           "LandUseHuman:NaturalHabitat",
+                                           "NaturalHabitat",
+                                           "LandUseHuman"))
+
+draw.summary$Group <- dplyr::recode(draw.summary$Variable,
+                                    "LandUseHuman" = "Land Use",
+                                    "NaturalHabitat" = "Natural Habitat",
+                                    "LandUseHuman:NaturalHabitat" = "Natural Habitat",
+                                    "PesticideToxicity" = "Pesticide Toxicity",
+                                    "LandUseHuman:PesticideToxicity" = "Pesticide Toxicity",
+                                    "ConversionDuration" = "Landscape Conversion Duration",
+                                    "LandUseHuman:ConversionDuration" = "Landscape Conversion Duration",
+                                    "ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "ThermalPosition_Delta" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Delta" = "Thermal Niche Properties")
+
+plotCols <- c("#D55E00","#F0E442","#E69F00","#009E73","#CC79A7")
+
+forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
+                                        xmin = draw.summary$Lower95, 
+                                        xmax = draw.summary$Upper95,
+                                        colour = draw.summary$Group)) + 
+  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
+                                 x = draw.summary$Mean,
+                                 xmin = draw.summary$Lower67,
+                                 xmax = draw.summary$Upper67,
+                                 colour = draw.summary$Group),
+                   fatten=1.8,size=1) +
+  scale_colour_manual(values = plotCols) +
+  geom_vline(mapping = aes(xintercept = 0)) +
+  labs(x = "Effect size",y = element_blank()) +
+  guides(colour = guide_legend(nrow = 3,reverse = TRUE,
+                               override.aes = aes(size=0.5))) + 
+  theme_classic() +
+  labs(colour = "Variable Group") + 
+  theme(legend.position = "bottom",
+        legend.direction = "vertical",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+  
+forestPlot
+```
+
+```{r figforestage50, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 50% instead of 30%. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; light orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; dark orange - realized thermal niche position and effect on this of climate change. For the baseline thermal niche position, the ThermalPosition_Baseline and ThermalPosition_Baseline2 coefficients refer to the linear and quadratic components of the polynomial relationship, respectively, combined to describe the curivlinear relationship shown in Figure 2."}
+finalModel_age50 <- readRDS(paste0(modelsDirRobustness,"ModelAge50.rds"))
+
+draws <- as_draws_df(finalModel_age50)[,3:15]
+
+draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
+draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
+draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
+draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
+draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
+
+draw.summary <- data.frame(Variable = names(draw.means),
+                           Mean = draw.means,
+                           Lower95 = draw.lower.95,
+                           Upper95 = draw.upper.95,
+                           Lower67 = draw.lower.67,
+                           Upper67 = draw.upper.67)
+
+draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
+draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
+draw.summary$Variable <- gsub("2k1","",draw.summary$Variable)
+draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
+draw.summary$Variable <- gsub("AgeConv501","ConversionDuration",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
+# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
+
+draw.summary$Variable <- factor(draw.summary$Variable,
+                                levels = c("LandUseHuman:ThermalPosition_Delta",
+                                           "ThermalPosition_Delta",
+                                           "LandUseHuman:ThermalPosition_Baseline2",
+                                           "LandUseHuman:ThermalPosition_Baseline",
+                                           "ThermalPosition_Baseline2",
+                                           "ThermalPosition_Baseline",
+                                           "LandUseHuman:ConversionDuration",
+                                           "ConversionDuration",
+                                           "LandUseHuman:PesticideToxicity",
+                                           "PesticideToxicity",
+                                           "LandUseHuman:NaturalHabitat",
+                                           "NaturalHabitat",
+                                           "LandUseHuman"))
+
+draw.summary$Group <- dplyr::recode(draw.summary$Variable,
+                                    "LandUseHuman" = "Land Use",
+                                    "NaturalHabitat" = "Natural Habitat",
+                                    "LandUseHuman:NaturalHabitat" = "Natural Habitat",
+                                    "PesticideToxicity" = "Pesticide Toxicity",
+                                    "LandUseHuman:PesticideToxicity" = "Pesticide Toxicity",
+                                    "ConversionDuration" = "Landscape Conversion Duration",
+                                    "LandUseHuman:ConversionDuration" = "Landscape Conversion Duration",
+                                    "ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "ThermalPosition_Delta" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Delta" = "Thermal Niche Properties")
+
+plotCols <- c("#D55E00","#F0E442","#E69F00","#009E73","#CC79A7")
+
+forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
+                                        xmin = draw.summary$Lower95, 
+                                        xmax = draw.summary$Upper95,
+                                        colour = draw.summary$Group)) + 
+  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
+                                 x = draw.summary$Mean,
+                                 xmin = draw.summary$Lower67,
+                                 xmax = draw.summary$Upper67,
+                                 colour = draw.summary$Group),
+                   fatten=1.8,size=1) +
+  scale_colour_manual(values = plotCols) +
+  geom_vline(mapping = aes(xintercept = 0)) +
+  labs(x = "Effect size",y = element_blank()) +
+  guides(colour = guide_legend(nrow = 3,reverse = TRUE,
+                               override.aes = aes(size=0.5))) + 
+  theme_classic() +
+  labs(colour = "Variable Group") + 
+  theme(legend.position = "bottom",
+        legend.direction = "vertical",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+  
+forestPlot
+```
+
+
+```{r figforestpesthigh, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to using high instead of low estimates of pesticide application density. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; light orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; dark orange - realized thermal niche position and effect on this of climate change. For the baseline thermal niche position, the ThermalPosition_Baseline and ThermalPosition_Baseline2 coefficients refer to the linear and quadratic components of the polynomial relationship, respectively, combined to describe the curivlinear relationship shown in Figure 2."}
+finalModel_pesthigh <- readRDS(paste0(modelsDirRobustness,"ModelPestHigh.rds"))
+
+draws <- as_draws_df(finalModel_pesthigh)[,3:15]
+
+draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
+draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
+draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
+draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
+draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
+
+draw.summary <- data.frame(Variable = names(draw.means),
+                           Mean = draw.means,
+                           Lower95 = draw.lower.95,
+                           Upper95 = draw.upper.95,
+                           Lower67 = draw.lower.67,
+                           Upper67 = draw.upper.67)
+
+draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
+draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
+draw.summary$Variable <- gsub("2k1","",draw.summary$Variable)
+draw.summary$Variable <- gsub("LogPestToxHigh1","PesticideToxicity",draw.summary$Variable)
+draw.summary$Variable <- gsub("AgeConv1","ConversionDuration",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
+draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
+# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
+
+draw.summary$Variable <- factor(draw.summary$Variable,
+                                levels = c("LandUseHuman:ThermalPosition_Delta",
+                                           "ThermalPosition_Delta",
+                                           "LandUseHuman:ThermalPosition_Baseline2",
+                                           "LandUseHuman:ThermalPosition_Baseline",
+                                           "ThermalPosition_Baseline2",
+                                           "ThermalPosition_Baseline",
+                                           "LandUseHuman:ConversionDuration",
+                                           "ConversionDuration",
+                                           "LandUseHuman:PesticideToxicity",
+                                           "PesticideToxicity",
+                                           "LandUseHuman:NaturalHabitat",
+                                           "NaturalHabitat",
+                                           "LandUseHuman"))
+
+draw.summary$Group <- dplyr::recode(draw.summary$Variable,
+                                    "LandUseHuman" = "Land Use",
+                                    "NaturalHabitat" = "Natural Habitat",
+                                    "LandUseHuman:NaturalHabitat" = "Natural Habitat",
+                                    "PesticideToxicity" = "Pesticide Toxicity",
+                                    "LandUseHuman:PesticideToxicity" = "Pesticide Toxicity",
+                                    "ConversionDuration" = "Landscape Conversion Duration",
+                                    "LandUseHuman:ConversionDuration" = "Landscape Conversion Duration",
+                                    "ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "ThermalPosition_Delta" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Delta" = "Thermal Niche Properties")
+
+plotCols <- c("#D55E00","#F0E442","#E69F00","#009E73","#CC79A7")
+
+forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
+                                        xmin = draw.summary$Lower95, 
+                                        xmax = draw.summary$Upper95,
+                                        colour = draw.summary$Group)) + 
+  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
+                                 x = draw.summary$Mean,
+                                 xmin = draw.summary$Lower67,
+                                 xmax = draw.summary$Upper67,
+                                 colour = draw.summary$Group),
+                   fatten=1.8,size=1) +
+  scale_colour_manual(values = plotCols) +
+  geom_vline(mapping = aes(xintercept = 0)) +
+  labs(x = "Effect size",y = element_blank()) +
+  guides(colour = guide_legend(nrow = 3,reverse = TRUE,
+                               override.aes = aes(size=0.5))) + 
+  theme_classic() +
+  labs(colour = "Variable Group") + 
+  theme(legend.position = "bottom",
+        legend.direction = "vertical",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+  
+forestPlot
+```
+
+
+```{r, figrelabundmodel, echo=FALSE,warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from a zero-inflated negative binomial model relating bumblebee relative abundance to land use, landscape habitat, pesticide toxicity and thermal niche properties**. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; light orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; dark orange - realized thermal niche position and effect on this of climate change. For the baseline thermal niche position, the ThermalPosition_Baseline and ThermalPosition_Baseline2 coefficients refer to the linear and quadratic components of the polynomial relationship, respectively, combined to describe the curivlinear relationship shown in Figure 2."}
 
 finalModel_relabund <- readRDS(paste0(modelsDirRobustness,"ModelZINBAbund.rds"))
 
@@ -346,371 +774,42 @@ draw.summary$Variable <- factor(draw.summary$Variable,
                                            "NaturalHabitat",
                                            "LandUseHuman"))
 
-plotCols <- c("#D55E00","#D55E00",
-              "#D55E00","#D55E00","#D55E00","#D55E00",
-              "#F0E442","#F0E442","#E69F00","#E69F00",
-              "#009E73","#009E73","#CC79A7")
+draw.summary$Group <- dplyr::recode(draw.summary$Variable,
+                                    "LandUseHuman" = "Land Use",
+                                    "NaturalHabitat" = "Natural Habitat",
+                                    "LandUseHuman:NaturalHabitat" = "Natural Habitat",
+                                    "PesticideToxicity" = "Pesticide Toxicity",
+                                    "LandUseHuman:PesticideToxicity" = "Pesticide Toxicity",
+                                    "ConversionDuration" = "Landscape Conversion Duration",
+                                    "LandUseHuman:ConversionDuration" = "Landscape Conversion Duration",
+                                    "ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "ThermalPosition_Delta" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Baseline2" = "Thermal Niche Properties",
+                                    "LandUseHuman:ThermalPosition_Delta" = "Thermal Niche Properties")
+
+plotCols <- c("#D55E00","#F0E442","#E69F00","#009E73","#CC79A7")
 
 forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
                                         xmin = draw.summary$Lower95, 
                                         xmax = draw.summary$Upper95,
-                                        colour = draw.summary$Variable)) + 
+                                        colour = draw.summary$Group)) + 
   geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
                                  x = draw.summary$Mean,
                                  xmin = draw.summary$Lower67,
                                  xmax = draw.summary$Upper67,
-                                 colour = draw.summary$Variable),
+                                 colour = draw.summary$Group),
                    fatten=1.8,size=1) +
   scale_colour_manual(values = plotCols) +
   geom_vline(mapping = aes(xintercept = 0)) +
   labs(x = "Effect size",y = element_blank()) +
+  guides(colour = guide_legend(nrow = 3,reverse = TRUE,
+                               override.aes = aes(size=0.5))) + 
   theme_classic() +
-  theme(legend.position = "none",
-        axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10))
-  
-forestPlot
-```
-
-```{r figforestnathab1, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of landscape natural habitat at 1-km instead of 2-km spatial grain. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; red - realized thermal niche position and effect on this of climate change."}
-finalModel_nathab1 <- readRDS(paste0(modelsDirRobustness,"ModelNatHab1k.rds"))
-
-draws <- as_draws_df(finalModel_nathab1)[,3:15]
-
-draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
-draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
-draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
-draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
-draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
-
-draw.summary <- data.frame(Variable = names(draw.means),
-                           Mean = draw.means,
-                           Lower95 = draw.lower.95,
-                           Upper95 = draw.upper.95,
-                           Lower67 = draw.lower.67,
-                           Upper67 = draw.upper.67)
-
-draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
-draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
-draw.summary$Variable <- gsub("1k1","",draw.summary$Variable)
-draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
-draw.summary$Variable <- gsub("AgeConv1","ConversionDuration",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
-# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
-
-draw.summary$Variable <- factor(draw.summary$Variable,
-                                levels = c("LandUseHuman:ThermalPosition_Delta",
-                                           "ThermalPosition_Delta",
-                                           "LandUseHuman:ThermalPosition_Baseline2",
-                                           "LandUseHuman:ThermalPosition_Baseline",
-                                           "ThermalPosition_Baseline2",
-                                           "ThermalPosition_Baseline",
-                                           "LandUseHuman:ConversionDuration",
-                                           "ConversionDuration",
-                                           "LandUseHuman:PesticideToxicity",
-                                           "PesticideToxicity",
-                                           "LandUseHuman:NaturalHabitat",
-                                           "NaturalHabitat",
-                                           "LandUseHuman"))
-
-plotCols <- c("#D55E00","#D55E00",
-              "#D55E00","#D55E00","#D55E00","#D55E00",
-              "#F0E442","#F0E442","#E69F00","#E69F00",
-              "#009E73","#009E73","#CC79A7")
-
-forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
-                                        xmin = draw.summary$Lower95, 
-                                        xmax = draw.summary$Upper95,
-                                        colour = draw.summary$Variable)) + 
-  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
-                                 x = draw.summary$Mean,
-                                 xmin = draw.summary$Lower67,
-                                 xmax = draw.summary$Upper67,
-                                 colour = draw.summary$Variable),
-                   fatten=1.8,size=1) +
-  scale_colour_manual(values = plotCols) +
-  geom_vline(mapping = aes(xintercept = 0)) +
-  labs(x = "Effect size",y = element_blank()) +
-  theme_classic() +
-  theme(legend.position = "none",
-        axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10))
-  
-forestPlot
-```
-
-```{r figforestnathab5, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of landscape natural habitat at 5-km instead of 2-km spatial grain. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; red - realized thermal niche position and effect on this of climate change."}
-finalModel_nathab5 <- readRDS(paste0(modelsDirRobustness,"ModelNatHab5k.rds"))
-
-draws <- as_draws_df(finalModel_nathab5)[,3:15]
-
-draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
-draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
-draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
-draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
-draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
-
-draw.summary <- data.frame(Variable = names(draw.means),
-                           Mean = draw.means,
-                           Lower95 = draw.lower.95,
-                           Upper95 = draw.upper.95,
-                           Lower67 = draw.lower.67,
-                           Upper67 = draw.upper.67)
-
-draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
-draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
-draw.summary$Variable <- gsub("5k1","",draw.summary$Variable)
-draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
-draw.summary$Variable <- gsub("AgeConv1","ConversionDuration",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
-# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
-
-draw.summary$Variable <- factor(draw.summary$Variable,
-                                levels = c("LandUseHuman:ThermalPosition_Delta",
-                                           "ThermalPosition_Delta",
-                                           "LandUseHuman:ThermalPosition_Baseline2",
-                                           "LandUseHuman:ThermalPosition_Baseline",
-                                           "ThermalPosition_Baseline2",
-                                           "ThermalPosition_Baseline",
-                                           "LandUseHuman:ConversionDuration",
-                                           "ConversionDuration",
-                                           "LandUseHuman:PesticideToxicity",
-                                           "PesticideToxicity",
-                                           "LandUseHuman:NaturalHabitat",
-                                           "NaturalHabitat",
-                                           "LandUseHuman"))
-
-plotCols <- c("#D55E00","#D55E00",
-              "#D55E00","#D55E00","#D55E00","#D55E00",
-              "#F0E442","#F0E442","#E69F00","#E69F00",
-              "#009E73","#009E73","#CC79A7")
-
-forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
-                                        xmin = draw.summary$Lower95, 
-                                        xmax = draw.summary$Upper95,
-                                        colour = draw.summary$Variable)) + 
-  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
-                                 x = draw.summary$Mean,
-                                 xmin = draw.summary$Lower67,
-                                 xmax = draw.summary$Upper67,
-                                 colour = draw.summary$Variable),
-                   fatten=1.8,size=1) +
-  scale_colour_manual(values = plotCols) +
-  geom_vline(mapping = aes(xintercept = 0)) +
-  labs(x = "Effect size",y = element_blank()) +
-  theme_classic() +
-  theme(legend.position = "none",
-        axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10))
-  
-forestPlot
-```
-
-```{r figforestpesthigh, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to using high instead of low estimates of pesticide application density. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; red - realized thermal niche position and effect on this of climate change."}
-finalModel_pesthigh <- readRDS(paste0(modelsDirRobustness,"ModelPestHigh.rds"))
-
-draws <- as_draws_df(finalModel_pesthigh)[,3:15]
-
-draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
-draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
-draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
-draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
-draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
-
-draw.summary <- data.frame(Variable = names(draw.means),
-                           Mean = draw.means,
-                           Lower95 = draw.lower.95,
-                           Upper95 = draw.upper.95,
-                           Lower67 = draw.lower.67,
-                           Upper67 = draw.upper.67)
-
-draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
-draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
-draw.summary$Variable <- gsub("2k1","",draw.summary$Variable)
-draw.summary$Variable <- gsub("LogPestToxHigh1","PesticideToxicity",draw.summary$Variable)
-draw.summary$Variable <- gsub("AgeConv1","ConversionDuration",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
-# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
-
-draw.summary$Variable <- factor(draw.summary$Variable,
-                                levels = c("LandUseHuman:ThermalPosition_Delta",
-                                           "ThermalPosition_Delta",
-                                           "LandUseHuman:ThermalPosition_Baseline2",
-                                           "LandUseHuman:ThermalPosition_Baseline",
-                                           "ThermalPosition_Baseline2",
-                                           "ThermalPosition_Baseline",
-                                           "LandUseHuman:ConversionDuration",
-                                           "ConversionDuration",
-                                           "LandUseHuman:PesticideToxicity",
-                                           "PesticideToxicity",
-                                           "LandUseHuman:NaturalHabitat",
-                                           "NaturalHabitat",
-                                           "LandUseHuman"))
-
-plotCols <- c("#D55E00","#D55E00",
-              "#D55E00","#D55E00","#D55E00","#D55E00",
-              "#F0E442","#F0E442","#E69F00","#E69F00",
-              "#009E73","#009E73","#CC79A7")
-
-forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
-                                        xmin = draw.summary$Lower95, 
-                                        xmax = draw.summary$Upper95,
-                                        colour = draw.summary$Variable)) + 
-  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
-                                 x = draw.summary$Mean,
-                                 xmin = draw.summary$Lower67,
-                                 xmax = draw.summary$Upper67,
-                                 colour = draw.summary$Variable),
-                   fatten=1.8,size=1) +
-  scale_colour_manual(values = plotCols) +
-  geom_vline(mapping = aes(xintercept = 0)) +
-  labs(x = "Effect size",y = element_blank()) +
-  theme_classic() +
-  theme(legend.position = "none",
-        axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10))
-  
-forestPlot
-```
-
-```{r figforestage10, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 10% instead of 30%. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; red - realized thermal niche position and effect on this of climate change."}
-finalModel_age10 <- readRDS(paste0(modelsDirRobustness,"ModelAge10.rds"))
-
-draws <- as_draws_df(finalModel_age10)[,3:15]
-
-draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
-draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
-draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
-draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
-draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
-
-draw.summary <- data.frame(Variable = names(draw.means),
-                           Mean = draw.means,
-                           Lower95 = draw.lower.95,
-                           Upper95 = draw.upper.95,
-                           Lower67 = draw.lower.67,
-                           Upper67 = draw.upper.67)
-
-draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
-draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
-draw.summary$Variable <- gsub("2k1","",draw.summary$Variable)
-draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
-draw.summary$Variable <- gsub("AgeConv101","ConversionDuration",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
-# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
-
-draw.summary$Variable <- factor(draw.summary$Variable,
-                                levels = c("LandUseHuman:ThermalPosition_Delta",
-                                           "ThermalPosition_Delta",
-                                           "LandUseHuman:ThermalPosition_Baseline2",
-                                           "LandUseHuman:ThermalPosition_Baseline",
-                                           "ThermalPosition_Baseline2",
-                                           "ThermalPosition_Baseline",
-                                           "LandUseHuman:ConversionDuration",
-                                           "ConversionDuration",
-                                           "LandUseHuman:PesticideToxicity",
-                                           "PesticideToxicity",
-                                           "LandUseHuman:NaturalHabitat",
-                                           "NaturalHabitat",
-                                           "LandUseHuman"))
-
-plotCols <- c("#D55E00","#D55E00",
-              "#D55E00","#D55E00","#D55E00","#D55E00",
-              "#F0E442","#F0E442","#E69F00","#E69F00",
-              "#009E73","#009E73","#CC79A7")
-
-forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
-                                        xmin = draw.summary$Lower95, 
-                                        xmax = draw.summary$Upper95,
-                                        colour = draw.summary$Variable)) + 
-  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
-                                 x = draw.summary$Mean,
-                                 xmin = draw.summary$Lower67,
-                                 xmax = draw.summary$Upper67,
-                                 colour = draw.summary$Variable),
-                   fatten=1.8,size=1) +
-  scale_colour_manual(values = plotCols) +
-  geom_vline(mapping = aes(xintercept = 0)) +
-  labs(x = "Effect size",y = element_blank()) +
-  theme_classic() +
-  theme(legend.position = "none",
-        axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10))
-  
-forestPlot
-```
-
-```{r figforestage50, echo=FALSE, warning=FALSE, fig.width=17.5/2.54, fig.height=12/2.54,out.width="100%", dpi=1200, fig.cap="**Forest plot of coefficient estimates from the full binomial Bayesian hierarchical model relating bumblebee occurrence to land use, landscape habitat, pesticide toxicity and thermal niche properties**. From the model testing robustness to fitting estimates of duration of substantial habitat modification where the threshold for defining substantial habitat modification is set at 50% instead of 30%. Points represent median coefficient estimates, thick horizontal bars the 67% credible intervals, and thin bars the 95% credible intervals. Effects whose 95% credible intervals do not cross zero are interpreted as being 'significant' effects. Coefficient estimates are coloured by variable grouping: purple - land use; green - landscape natural habitat; orange - pesticide toxicity; yellow - duration of substantial landscape habitat modification to human uses; red - realized thermal niche position and effect on this of climate change."}
-finalModel_age50 <- readRDS(paste0(modelsDirRobustness,"ModelAge50.rds"))
-
-draws <- as_draws_df(finalModel_age50)[,3:15]
-
-draw.means <- apply(X = draws,MARGIN = 2,FUN = mean)
-draw.lower.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.025)
-draw.upper.95 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.975)
-draw.lower.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.16667)
-draw.upper.67 <- apply(X = draws,MARGIN = 2,FUN = quantile,probs = 0.83333)
-
-draw.summary <- data.frame(Variable = names(draw.means),
-                           Mean = draw.means,
-                           Lower95 = draw.lower.95,
-                           Upper95 = draw.upper.95,
-                           Lower67 = draw.lower.67,
-                           Upper67 = draw.upper.67)
-
-draw.summary$Variable <- gsub("b_","",draw.summary$Variable)
-draw.summary$Variable <- gsub("poly","",draw.summary$Variable)
-draw.summary$Variable <- gsub("2k1","",draw.summary$Variable)
-draw.summary$Variable <- gsub("LogPestToxLow1","PesticideToxicity",draw.summary$Variable)
-draw.summary$Variable <- gsub("AgeConv501","ConversionDuration",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL21","ThermalPosition_Baseline",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_BL22","ThermalPosition_Baseline2",draw.summary$Variable)
-draw.summary$Variable <- gsub("TEI_delta1","ThermalPosition_Delta",draw.summary$Variable)
-# draw.summary$Variable <- gsub("LogElevation1","Elevation",draw.summary$Variable)
-
-draw.summary$Variable <- factor(draw.summary$Variable,
-                                levels = c("LandUseHuman:ThermalPosition_Delta",
-                                           "ThermalPosition_Delta",
-                                           "LandUseHuman:ThermalPosition_Baseline2",
-                                           "LandUseHuman:ThermalPosition_Baseline",
-                                           "ThermalPosition_Baseline2",
-                                           "ThermalPosition_Baseline",
-                                           "LandUseHuman:ConversionDuration",
-                                           "ConversionDuration",
-                                           "LandUseHuman:PesticideToxicity",
-                                           "PesticideToxicity",
-                                           "LandUseHuman:NaturalHabitat",
-                                           "NaturalHabitat",
-                                           "LandUseHuman"))
-
-plotCols <- c("#D55E00","#D55E00",
-              "#D55E00","#D55E00","#D55E00","#D55E00",
-              "#F0E442","#F0E442","#E69F00","#E69F00",
-              "#009E73","#009E73","#CC79A7")
-
-forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Variable,
-                                        xmin = draw.summary$Lower95, 
-                                        xmax = draw.summary$Upper95,
-                                        colour = draw.summary$Variable)) + 
-  geom_pointrangeh(mapping = aes(y = draw.summary$Variable,
-                                 x = draw.summary$Mean,
-                                 xmin = draw.summary$Lower67,
-                                 xmax = draw.summary$Upper67,
-                                 colour = draw.summary$Variable),
-                   fatten=1.8,size=1) +
-  scale_colour_manual(values = plotCols) +
-  geom_vline(mapping = aes(xintercept = 0)) +
-  labs(x = "Effect size",y = element_blank()) +
-  theme_classic() +
-  theme(legend.position = "none",
+  labs(colour = "Variable Group") + 
+  theme(legend.position = "bottom",
+        legend.direction = "vertical",
         axis.title = element_text(size = 12),
         axis.text = element_text(size = 10))
   

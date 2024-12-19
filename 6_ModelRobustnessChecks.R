@@ -49,7 +49,7 @@ diversityAbund <- diversity %>% subset(Diversity_metric_type=="Abundance" &
                                          Diversity_metric_unit=="individuals")
 
 # Create modelling data with only abundance records
-modelDataAbund <- diversity[,c('Effort_corrected_measurement','LandUse','TEI_BL',
+modelDataAbund <- diversityAbund[,c('Effort_corrected_measurement','LandUse','TEI_BL',
                           'TEI_delta','LogElevation','SS','SSBS',
                           'Taxon_name_entered','Longitude','Latitude',
                           'Best_guess_binomial','Country',
