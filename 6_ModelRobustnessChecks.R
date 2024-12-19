@@ -18,6 +18,7 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
+suppressMessages(suppressWarnings(library(dplyr)))
 suppressMessages(suppressWarnings(library(brms)))
 
 # Print session information
@@ -42,6 +43,52 @@ diversity$UI[grepl("NA",diversity$UI)] <- NA
 diversity$UI[grepl("Cannot decide",diversity$UI)] <- NA
 diversity$UI <- factor(diversity$UI)
 diversity$UI <- relevel(diversity$UI,ref="Natural")
+
+# Create version of dataset with only abundance records
+diversityAbund <- diversity %>% subset(Diversity_metric_type=="Abundance" & 
+                                         Diversity_metric_unit=="individuals")
+
+# Create modelling data with only abundance records
+modelDataAbund <- diversity[,c('Effort_corrected_measurement','LandUse','TEI_BL',
+                          'TEI_delta','LogElevation','SS','SSBS',
+                          'Taxon_name_entered','Longitude','Latitude',
+                          'Best_guess_binomial','Country',
+                          'LogPestToxLow','LogPestToxHigh',
+                          'NaturalHabitat1k','NaturalHabitat2k','NaturalHabitat5k',
+                          'AgeConv','AgeConv10','AgeConv50')]
+
+# Remove rows with any NA values
+modelDataAbund <- na.omit(modelDataAbund)
+
+# Round effort-corrected abundance measurements to the nearest integer for
+# compatibility with a zero-inflated negative-binomial model
+modelDataAbund <- modelDataAbund %>% mutate(Abundance=ceiling(Effort_corrected_measurement)) 
+
+# Run zero-inflated negative binomial model of abundance, with same
+# fixed-effects structure as main model
+model <- brm(formula = Abundance~
+               # Control for elevational effects
+               poly(LogElevation,1)+
+               # Main effects of land use, and landscape pesticide toxicity and
+               # conversion age
+               LandUse+
+               poly(NaturalHabitat2k,1)+
+               poly(LogPestToxLow,1)+
+               poly(AgeConv,1)+
+               # Interactions between land use and other variables
+               LandUse:poly(NaturalHabitat2k,1)+
+               LandUse:poly(LogPestToxLow,1)+
+               LandUse:poly(AgeConv,1)+
+               # Climate niche variables and interactions
+               poly(TEI_BL,2)+poly(TEI_delta,1)+
+               LandUse:poly(TEI_BL,2)+
+               LandUse:poly(TEI_delta,1)+
+               # Random effects
+               (1|SS)+(1|SSBS)+(1|Taxon_name_entered),
+             data=modelDataAbund,family=zero_inflated_negbinomial(),
+             iter=2000,chains=4,cores=4)
+
+saveRDS(object = model,file = paste0(outDir,"ModelZINBAbund.rds"))
 
 # Select relevant columns
 modelData <- diversity[,c('occur','LandUse','TEI_BL',
