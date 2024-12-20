@@ -147,11 +147,11 @@ pest_tox_H <- rast(lapply(X = pest_H,FUN = function(pest.map){
     
     tox.map <- pest.map/LD50.contact
     
-  } else if (!is.na(LD50.oral)){
-    # Otherwise, if LD50 oral estimate is available, use that
-    cat(paste0(pest_name," - ORAL","\n"))
-    
-    tox.map <- pest.map/LD50.oral
+  # } else if (!is.na(LD50.oral)){
+  #   # Otherwise, if LD50 oral estimate is available, use that
+  #   cat(paste0(pest_name," - ORAL","\n"))
+  #   
+  #   tox.map <- pest.map/LD50.oral
   } else {
     # Otherwise, set this pesticide to zero
     cat(paste0(pest_name," - MISSING","\n"))
@@ -192,11 +192,11 @@ pest_tox_L <- rast(lapply(X = pest_L,FUN = function(pest.map){
     
     tox.map <- pest.map/LD50.contact
     
-  } else if (!is.na(LD50.oral)){
-    # Otherwise, if LD50 oral estimate is available, use that
-    cat(paste0(pest_name," - ORAL","\n"))
-    
-    tox.map <- pest.map/LD50.oral
+  # } else if (!is.na(LD50.oral)){
+  #   # Otherwise, if LD50 oral estimate is available, use that
+  #   cat(paste0(pest_name," - ORAL","\n"))
+  #   
+  #   tox.map <- pest.map/LD50.oral
   } else {
     # Otherwise, set this pesticide to zero
     cat(paste0(pest_name," - MISSING","\n"))

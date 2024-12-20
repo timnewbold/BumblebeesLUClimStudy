@@ -254,3 +254,12 @@ model6 <- brm(formula = occur~
               iter=2000,chains=4,cores=4)
 
 saveRDS(model6,paste0(outDir,"ModelPestHigh.rds"))
+
+# End timer
+t.end <- Sys.time()
+
+# Display run-time
+print(round(t.end - t.start,0))
+
+# Close log file
+sink()
