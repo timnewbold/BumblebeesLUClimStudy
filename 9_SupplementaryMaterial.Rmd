@@ -40,11 +40,13 @@ suppressMessages(suppressWarnings(library(sf)))
 suppressMessages(suppressWarnings(library(snow)))
 suppressMessages(suppressWarnings(library(parallel)))
 suppressMessages(suppressWarnings(library(spdep)))
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(tidyr)))
 
 # Set input directories
 dataDir <- "2_PrepareDiversityData/"
 modelsDir <- "3_RunModels/"
-modelsDirRobustness <- "6_ModelRobustnessChecks/"
+modelsDirRobustness <- "6_ModelRobustnessChecks_old/"
 
 # Load the compiled species-level data
 diversity <- readRDS(paste0(dataDir,"diversity_data.rds"))
@@ -160,6 +162,43 @@ mapPreds <- ggplot() + geom_sf(data = baseMap,fill = "#ffffff") +
         legend.text = element_text(size=10))
 
 mapPreds
+```
+
+\newpage
+
+# Species in Analysis
+
+```{r, echo=FALSE, warning=FALSE,results=FALSE}
+
+species.table <- tibble::as_tibble(unique(modelData$Best_guess_binomial))
+names(species.table) <- "Species"
+
+kableExtra::kable(x = species.table,caption = "List of all species included in the analysis")
+
+```
+
+```{r, echo=FALSE,warning=FALSE,results=FALSE,fig.width=16.5/2.54,fig.height=12/2.54,out.width="100%",dpi=1200,fig.cap="**Representation of species with different threat statuses in the model**. For European bumble bee species, for which all species have been assigned a Red List status (https://portals.iucn.org/library/sites/library/files/documents/RL-4-019.pdf), the distribution of sampled (Data = Yes) and unsampled species (Data = No) among different levels of extinction risk (LC = Least Concern, NT = Near Threatened, VU = Vulnerable, EN = Endangered, CR = Critically Endangered, DD = Data Deficient). Reveals a bias in sampling towards species with lower levels of assessed extinction risk."}
+
+sp.threat.samples <- read.csv(paste0(dataDir,"BumblebeeThreatStatus.csv"))
+
+threat.sample.counts <- sp.threat.samples %>% 
+  group_by(Status, Data) %>% 
+  summarise(n = n()) %>%
+  ungroup %>%
+  complete(Status, Data, fill = list(n = 0))
+
+threat.sample.counts$Status <- factor(threat.sample.counts$Status,
+                                      levels=c("LC","NT","VU","EN","CR","DD"))
+
+stackbar <- ggplot(data = threat.sample.counts, 
+                   mapping = aes(x = Status,y = n,fill = Data)) + 
+  geom_bar(stat='identity', position = 'stack') + 
+  scale_y_continuous(name = 'Number of species') + 
+  scale_fill_manual(values = c("#BF2C23","#2F67B1")) + 
+  theme_classic()
+
+stackbar
+
 ```
 
 \newpage
