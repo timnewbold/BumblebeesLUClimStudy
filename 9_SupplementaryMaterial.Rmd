@@ -46,7 +46,7 @@ suppressMessages(suppressWarnings(library(tidyr)))
 # Set input directories
 dataDir <- "2_PrepareDiversityData/"
 modelsDir <- "3_RunModels/"
-modelsDirRobustness <- "6_ModelRobustnessChecks_old/"
+modelsDirRobustness <- "6_ModelRobustnessChecks/"
 
 # Load the compiled species-level data
 diversity <- readRDS(paste0(dataDir,"diversity_data.rds"))
@@ -132,6 +132,8 @@ moran$p <- as.numeric(moran$p)
 
 ```
 
+\newpage
+
 # Sites in Analysis
 
 <br />
@@ -168,7 +170,7 @@ mapPreds
 
 # Species in Analysis
 
-```{r, echo=FALSE, warning=FALSE,results=FALSE}
+```{r, echo=FALSE, warning=FALSE,results=TRUE,message=FALSE}
 
 species.table <- tibble::as_tibble(unique(modelData$Best_guess_binomial))
 names(species.table) <- "Species"
@@ -176,16 +178,18 @@ names(species.table) <- "Species"
 kableExtra::kable(x = species.table,caption = "List of all species included in the analysis")
 
 ```
+\newpage
 
 ```{r, echo=FALSE,warning=FALSE,results=FALSE,fig.width=16.5/2.54,fig.height=12/2.54,out.width="100%",dpi=1200,fig.cap="**Representation of species with different threat statuses in the model**. For European bumble bee species, for which all species have been assigned a Red List status (https://portals.iucn.org/library/sites/library/files/documents/RL-4-019.pdf), the distribution of sampled (Data = Yes) and unsampled species (Data = No) among different levels of extinction risk (LC = Least Concern, NT = Near Threatened, VU = Vulnerable, EN = Endangered, CR = Critically Endangered, DD = Data Deficient). Reveals a bias in sampling towards species with lower levels of assessed extinction risk."}
 
 sp.threat.samples <- read.csv(paste0(dataDir,"BumblebeeThreatStatus.csv"))
 
-threat.sample.counts <- sp.threat.samples %>% 
+threat.sample.counts <- suppressMessages(suppressWarnings(
+  sp.threat.samples %>% 
   group_by(Status, Data) %>% 
   summarise(n = n()) %>%
   ungroup %>%
-  complete(Status, Data, fill = list(n = 0))
+  complete(Status, Data, fill = list(n = 0))))
 
 threat.sample.counts$Status <- factor(threat.sample.counts$Status,
                                       levels=c("LC","NT","VU","EN","CR","DD"))
@@ -272,6 +276,8 @@ plots <- plot_grid(histNatHab,histAge,histPest,histTEIBL,histTEIDelta,
 plots
 ```
 
+\newpage
+
 # Model Diagnostic Checks
 
 <br />    
@@ -335,7 +341,7 @@ text(x=0.07,y=8,labels=paste0("Significant \nspatial \nautocorrelation \nin ",ro
 
 ```
 
-<br />
+\newpage
 
 # Model Robustness Checks
 
@@ -1023,5 +1029,6 @@ forestPlot <- ggplot() + geom_linerangeh(mapping = aes(y=draw.summary$Label,
 forestPlot
 ```
 
+\newpage
 
 # References to Original Data Papers in PREDICTS Database
