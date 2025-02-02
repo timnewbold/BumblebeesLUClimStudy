@@ -1,6 +1,6 @@
 ---
 title: Bumble bee probability of occurrence responds to interactions between local and landscape land use, climatic niche properties and climate change
-author: "Tim Newbold^1,\\*^, Jeremy Kerr^2^, Peter Soroye^2,&dagger;^, Jessica J. Williams^1^"
+author: "Tim Newbold^1,\\*^, Jeremy Kerr^2^, Peter Soroye^2,&dagger;^, Jessica J. Williams^1,&Dagger;^"
 output:
   bookdown::word_document2:
     toc: false
@@ -16,6 +16,8 @@ bibliography: bumblebees_lu_cc_refs.bib
 ^2^Department of Biology, University of Ottawa, Ottawa, Ontario, Canada
 
 ^&dagger;^Current address: Wildlife Conservation Society Canada, Toronto, Ontario, Canada
+
+^&Dagger;^Current address: Department of Life Sciences, Silwood Park Campus, Imperial College London, London, UK
 
 ^\*^Correspondence: Tim Newbold, Centre for Biodiversity & Environment Research, Department of Genetics, Evolution & Environment, University College London, Gower Street, London WC1E 6BT, United Kingdom; Email: [t.newbold@ucl.ac.uk](mailto:t.newbold@ucl.ac.uk); Tel: +44(0)2031087569
 
