@@ -182,7 +182,7 @@ kableExtra::kable(x = species.table,caption = "List of all species included in t
 ```
 \newpage
 
-```{r, echo=FALSE,warning=FALSE,results=FALSE,fig.width=16.5/2.54,fig.height=12/2.54,out.width="100%",dpi=1200,fig.cap="**Representation of species with different threat statuses in the model**. For European bumble bee species, for which all species have been assigned a Red List status (https://portals.iucn.org/library/sites/library/files/documents/RL-4-019.pdf), the distribution of sampled (Data = Yes) and unsampled species (Data = No) among different levels of extinction risk (LC = Least Concern, NT = Near Threatened, VU = Vulnerable, EN = Endangered, CR = Critically Endangered, DD = Data Deficient). Reveals a bias in sampling towards species with lower levels of assessed extinction risk."}
+```{r, echo=FALSE,warning=FALSE,results=FALSE,fig.width=16.5/2.54,fig.height=12/2.54,out.width="100%",dpi=1200,fig.cap="**Representation of species with different threat statuses in the model**. For European bumble bee species, for which all species have been assigned a Red List status (https://portals.iucn.org/library/sites/library/files/documents/RL-4-019.pdf), the distribution of sampled and unsampled species among different levels of extinction risk (LC = Least Concern, NT = Near Threatened, VU = Vulnerable, EN = Endangered, CR = Critically Endangered, DD = Data Deficient). Reveals a bias in sampling towards species with lower levels of assessed extinction risk."}
 
 sp.threat.samples <- read.csv(paste0(dataDir,"BumblebeeThreatStatus.csv"))
 
@@ -201,6 +201,7 @@ stackbar <- ggplot(data = threat.sample.counts,
   geom_bar(stat='identity', position = 'stack') + 
   scale_y_continuous(name = 'Number of species') + 
   scale_fill_manual(values = c("#BF2C23","#2F67B1")) + 
+  labs(fill = "Species Sampled") + 
   theme_classic()
 
 stackbar

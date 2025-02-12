@@ -31,7 +31,7 @@ bibliography: bumblebees_lu_cc_refs.bib
 
 **Number of words in abstract:** 150
 
-**Number of words in main text (excluding abstract, acknowledgments, references, and table and figure legends):** 4,976
+**Number of words in main text (excluding abstract, acknowledgments, references, and table and figure legends):** 4,974
 
 **Number of references:** 68
 
@@ -420,7 +420,8 @@ plotHab <- ggplot() +
   theme_classic() + 
   theme(legend.justification = c(0.5, 0.5),
         axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10))
+        axis.text = element_text(size = 10)) + 
+  labs(colour = "Land Use", fill = "Land Use")
 
 plotHab2 <- plotHab + theme(legend.position = "none")
 
@@ -843,7 +844,7 @@ clusterExport(cl = cl,varlist = c("finalModel","nd.bl","nd.obs"))
 
 # Make 1,000 predictions of % difference between observed
 # and baseline conditions
-preds <- parSapply(cl = cl,X = 1:10,FUN = function(i){
+preds <- parSapply(cl = cl,X = 1:1000,FUN = function(i){
   
   # Draw one of the posterior parameter estimates at random
   i <- sample(x = 1:4000,size = 1,replace = FALSE)
