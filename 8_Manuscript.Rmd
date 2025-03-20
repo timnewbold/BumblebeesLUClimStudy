@@ -49,7 +49,7 @@ options(scipen=20)
 
 # Abstract
 
-Insect biodiversity is changing rapidly, driven by a suite of pressures, notably land use, land-use intensification, and increasingly climate change. We lack large-scale evidence on how land use and climate change interact to drive insect biodiversity changes. We assess bumble bee responses to interactive effects of land use and climate pressures across North America and Europe. Probability of occurrence increases in landscapes with a higher proportion of natural habitat and a shorter history of human disturbance. Responses to climate warming relative to historical conditions are weakly negative in natural habitats but positive in human land uses, while human land use reduces probability of occurrence most in the centre of species’ temperature niches. We estimate that the combined pressures have reduced bumble bee probability of occurrence by 52% across sampled natural habitats, and 59% across human land uses, highlighting the pervasive influence that human pressures have had on biodiversity across habitats.
+Insect biodiversity is changing rapidly, driven by a suite of pressures, notably land use, land-use intensification, and increasingly climate change. We lack large-scale evidence on how land use and climate change interact to drive insect biodiversity changes. We assess bumble bee responses to interactive effects of land use and climate pressures across North America and Europe. Probability of occurrence increases in landscapes with a higher proportion of natural habitat and a shorter history of human disturbance. Responses to climate warming relative to historical conditions are weakly negative in natural habitats but positive in human land uses, while human land use reduces probability of occurrence most in the centre of species’ temperature niches. We estimate that the combined pressures have reduced bumble bee probability of occurrence by 45% across sampled natural habitats, and 56% across human land uses, highlighting the pervasive influence that human pressures have had on biodiversity across habitats.
 
 \newpage
 
@@ -144,8 +144,6 @@ To reveal the impacts that cumulative pressures have had on bumble bee occurrenc
 <!-- PLOTTING: Setup for model results plots -->
 ```{r results_setup, echo=FALSE,warning=FALSE}
 #### Model results plot - Setup ####
-
-# set.seed(1234)
 
 # Set input directory
 inDir <- "3_RunModels/"
@@ -839,7 +837,7 @@ nd.bl$TEI_delta <- 0
 nd.obs <- droplevels(modelData)
 
 # cl <- makeCluster(detectCores()-1)
-cl <- makeCluster(4)
+cl <- makeCluster(8)
 clusterExport(cl = cl,varlist = c("finalModel","nd.bl","nd.obs"))
 
 # Make 1,000 predictions of % difference between observed
