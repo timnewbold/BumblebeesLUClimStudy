@@ -29,21 +29,21 @@ outDir <- "2_PrepareDiversityData/"
 ## Estimates of the realized climatic niches of bumblebees, and how these have
 ## changed under recent climate change can be downloaded from the dedicated
 ## Figshare repository for this paper:
-## INSERT LINK
+## 10.6084/m9.figshare.28631153
 ## The creation of these estimates is described in Soroye et al. (2020), DOI: 
 ## 10.1126/science.aax8591
 
 ## LAND-USE HISTORY
 ## Data on the year in which landscapes were first 30% converted to human land
 ## uses is also available in the dedicated Figshare repository for this paper:
-## INSERT LINK
+## 10.6084/m9.figshare.28631153
 ## For more information on these estimates, see Newbold et al. (2015), DOI:
 ## 10.1038/nature14324
 
 ## UN SUB-REGIONS MAP
-## A map of UN sub-regions, for plottingpurposes, can be downladed from the
+## A map of UN sub-regions, for plotting purposes, can be downloaded from the
 ## dedicated Figshare repository for this paper:
-## INSERT LINK
+## 10.6084/m9.figshare.28631153
 
 # Create output directory, if it doesn't already exist
 if(!dir.exists(outDir)) dir.create(outDir)

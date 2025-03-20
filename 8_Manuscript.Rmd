@@ -839,7 +839,7 @@ nd.bl$TEI_delta <- 0
 nd.obs <- droplevels(modelData)
 
 # cl <- makeCluster(detectCores()-1)
-cl <- makeCluster(2)
+cl <- makeCluster(4)
 clusterExport(cl = cl,varlist = c("finalModel","nd.bl","nd.obs"))
 
 # Make 1,000 predictions of % difference between observed
@@ -978,7 +978,7 @@ print(sessionInfo())
 
 # Data and Code Availability:
 
-Code to run the analyses is available on GitHub ([https://github.com/timnewbold/BumblebeesLUClimStudy](https://github.com/timnewbold/BumblebeesLUClimStudy)). Data are available on FigShare ([https://figshare.com/s/5e88f431142bc8fc454a](https://figshare.com/s/5e88f431142bc8fc454a)) - temporary link for peer review.
+The code needed to run all of the analyses is publicly available on ([GitHub](https://github.com/timnewbold/BumblebeesLUClimStudy)). The data needed to run the code are published on FigShare, DOI: ([10.6084/m9.figshare.28631153](http://doi.org/10.6084/m9.figshare.28631153)), except for datasets for which we do not have permission to republish, but which are freely available in other public repositories. Instructions for obtaining these additional datasets are given both in the FigShare repository description, and at the top of the first two code scripts.
 
 # Acknowledgments
 
