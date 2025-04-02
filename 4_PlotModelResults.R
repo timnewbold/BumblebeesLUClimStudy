@@ -18,11 +18,11 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
-suppressMessages(suppressWarnings(library(brms)))
-suppressMessages(suppressWarnings(library(Hmisc)))
-suppressMessages(suppressWarnings(library(ggplot2)))
-suppressMessages(suppressWarnings(library(ggstance)))
-suppressMessages(suppressWarnings(library(cowplot)))
+suppressMessages(suppressWarnings(library(brms))) # Version 2.21.0
+suppressMessages(suppressWarnings(library(Hmisc))) # Version 5.1-1
+suppressMessages(suppressWarnings(library(ggplot2))) # Version 3.5.1
+suppressMessages(suppressWarnings(library(ggstance))) # Version 0.3.7
+suppressMessages(suppressWarnings(library(cowplot))) # Version 1.1.3
 
 # Print session information
 sessionInfo()

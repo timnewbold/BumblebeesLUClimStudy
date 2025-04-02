@@ -18,14 +18,14 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
-suppressMessages(suppressWarnings(library(brms)))
-suppressMessages(suppressWarnings(library(parallel)))
-suppressMessages(suppressWarnings(library(snow)))
-suppressMessages(suppressWarnings(library(terra)))
-suppressMessages(suppressWarnings(library(ggplot2)))
-suppressMessages(suppressWarnings(library(ggmap)))
-suppressMessages(suppressWarnings(library(cowplot)))
-suppressMessages(suppressWarnings(library(sf)))
+suppressMessages(suppressWarnings(library(brms))) # Version 2.21.0
+suppressMessages(suppressWarnings(library(parallel))) # Version 4.3.1
+suppressMessages(suppressWarnings(library(snow))) # Version 0.4-4
+suppressMessages(suppressWarnings(library(terra))) # Version 1.7-71
+suppressMessages(suppressWarnings(library(ggplot2))) # Version 3.5.1
+suppressMessages(suppressWarnings(library(ggmap))) # Version 4.0.0
+suppressMessages(suppressWarnings(library(cowplot))) # Version 1.1.3
+suppressMessages(suppressWarnings(library(sf))) # Version 1.0-19
 
 # Print session information
 sessionInfo()

@@ -18,7 +18,7 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
-suppressMessages(suppressWarnings(library(terra)))
+suppressMessages(suppressWarnings(library(terra))) # Version 1.7-71
 
 # Print session information
 sessionInfo()

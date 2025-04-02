@@ -32,18 +32,18 @@ set.seed(1234)
 <!-- SETUP: read data and models -->
 ```{r,echo=FALSE,results=FALSE,warning=FALSE}
 # Load required packages
-suppressMessages(suppressWarnings(library(terra)))
-suppressMessages(suppressWarnings(library(brms)))
-suppressMessages(suppressWarnings(library(Hmisc)))
-suppressMessages(suppressWarnings(library(ggplot2)))
-suppressMessages(suppressWarnings(library(ggstance)))
-suppressMessages(suppressWarnings(library(cowplot)))
-suppressMessages(suppressWarnings(library(sf)))
-suppressMessages(suppressWarnings(library(snow)))
-suppressMessages(suppressWarnings(library(parallel)))
-suppressMessages(suppressWarnings(library(spdep)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(tidyr)))
+suppressMessages(suppressWarnings(library(terra))) # Version 1.7-71
+suppressMessages(suppressWarnings(library(brms))) # Version 2.21.0
+suppressMessages(suppressWarnings(library(Hmisc))) # Version 5.1-1
+suppressMessages(suppressWarnings(library(ggplot2))) # Version 3.5.1
+suppressMessages(suppressWarnings(library(ggstance))) # Version 0.3.7
+suppressMessages(suppressWarnings(library(cowplot))) # Version 1.1.3
+suppressMessages(suppressWarnings(library(sf))) # Version 1.0-19
+suppressMessages(suppressWarnings(library(snow))) # Version 0.4-4
+suppressMessages(suppressWarnings(library(parallel))) # Version 4.3.1
+suppressMessages(suppressWarnings(library(spdep))) # Version 1.2-8
+suppressMessages(suppressWarnings(library(dplyr))) # Version 1.1.3
+suppressMessages(suppressWarnings(library(tidyr))) # Version 1.3.1
 
 # Set input directories
 dataDir <- "2_PrepareDiversityData/"

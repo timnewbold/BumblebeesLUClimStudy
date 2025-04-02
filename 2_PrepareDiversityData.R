@@ -16,8 +16,8 @@ outDir <- "2_PrepareDiversityData/"
 ## The PREDICTS database, documenting the structure of ecological assemblages
 ## across different land-use types and intensities, can be downloaded from the 
 ## data portal of the Natural History Museum
-## http://dx.doi.org/10.5519/0066354
-## You should download the RDS-format file, and save as database.rds
+## http://dx.doi.org/10.5519/j4sh7e0w
+## You should download the RDS-format file, and save as 0_data\database.rds
 
 ## ELEVATION
 ## A Digital Elevation Model at 30 arc-second spatial resolution can be 
@@ -57,19 +57,21 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
-suppressMessages(suppressWarnings(library(terra)))
-suppressMessages(suppressWarnings(library(predictsFunctions)))
-suppressMessages(suppressWarnings(library(raster)))
-suppressMessages(suppressWarnings(library(rgdal)))
+suppressMessages(suppressWarnings(library(terra)))# Version 1.7-71
+suppressMessages(suppressWarnings(library(predictsFunctions))) # Version 1.0
+# Available at https://github.com/timnewbold/predicts-demo
 # To obtain this package, run:
 # remotes::install_github("timnewbold/predicts-demo",subdir="predictsFunctions")
+suppressMessages(suppressWarnings(library(raster))) # Version 3.6-26
+suppressMessages(suppressWarnings(library(rgdal))) # Version 1.6-7
+# Available on the CRAN archive (https://cran.r-project.org/src/contrib/Archive/rgdal/)
 
 # Print session information to log file
 sessionInfo()
 
 cat('Loading database extracts\n')
 # Read the PREDICTS database
-diversity<-readRDS(paste(dataDir,"database.rds",sep=""))
+diversity<-readRDS(paste(dataDir,"database_v1.rds",sep=""))
 
 cat('Selecting appropriate data\n')
 # Remove sites without geographical coordinates

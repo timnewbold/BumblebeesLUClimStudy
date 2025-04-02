@@ -18,8 +18,8 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(brms)))
+suppressMessages(suppressWarnings(library(dplyr))) # Version 1.1.3
+suppressMessages(suppressWarnings(library(brms))) # Version 2.21.0
 
 # Print session information
 sessionInfo()

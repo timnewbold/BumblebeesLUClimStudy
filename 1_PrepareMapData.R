@@ -15,10 +15,11 @@ outDir <- "1_PrepareMapData/"
 ## COVERAGE OF NATURAL HABITAT
 ## Data on the coverage of natural (primary and secondary) habitats can be
 ## downloaded here:
-## https://data.csiro.au/collection/csiro:15276v3
-## These data then need to be pre-processed by multiplying by 1000 and converting
-## to an integer value, with the resulting raster files saved as:
-## 'pri_1km_int' and 'sec_1km_int'
+## https://data.csiro.au/collection/csiro:15276v3 
+## (Data Version 3, DOI: 10.4225/08/56DCD9249B224)
+## The files that need to be downloaded are PRI_2005.ZIP and SEC_2005.ZIP
+## The files in data\PRI_2005 and data\SEC_2005 need to be extracted and saved
+## in 0_data\PRI_2005 and 0_data\SEC_2005 in the analysis code repository 
 
 ## FERTILIZERS
 ## Global data on the density of application (kg/ha) of nitrogen, phosphorous and 
@@ -29,7 +30,7 @@ outDir <- "1_PrepareMapData/"
 ## PESTICIDES
 ## Global data on the density of application (kg/ha) of different types of pesticides
 ## on different agricultural crops can be downloaded (in GeoTIFF format) here:
-## https://sedac.ciesin.columbia.edu/data/set/ferman-v1-pest-chemgrids-v1-01/data-download
+## https://doi.org/10.6084/m9.figshare.7764014.v6
 ## The downloaded data need to be in the following directory structure:
 ## 'PEST-CHEMGRIDS_v1_01_APR/GEOTIFF'
 
@@ -45,7 +46,7 @@ t.start <- Sys.time()
 print(t.start)
 
 # Load required packages
-suppressMessages(suppressWarnings(library(terra)))
+suppressMessages(suppressWarnings(library(terra))) # Version 1.7-71
 
 # Print session information to log file
 sessionInfo()
@@ -57,10 +58,14 @@ cat('Natural habitat\n')
 behrCRS <- '+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 +datum=WGS84 +ellps=WGS84 +units=m +no_defs'
 
 # Read in mapped estimates of primary vegetation
-pri <- terra::rast(paste0(dataDir,"pri_1km_int"))
+pri <- terra::rast(paste0(dataDir,"PRI_2005/PRI_1km_2005_0ice.bil"))
+# Multiply by 1000 and convert to integer for more efficient storage and calculation
+pri <- round(pri*1000)
 
 # Read in mapped estimates of secondary vegetation
-sec <- terra::rast(paste0(dataDir,"sec_1km_int"))
+sec <- terra::rast(paste0(dataDir,"SEC_2005/SEC_1km_2005_0ice.bil"))
+# Multiply by 1000 and convert to integer for more efficient storage and calculation
+sec <- round(sec*1000)
 
 # Combine primary and secondary vegetation to create estimates of total natural habitat
 nat <- pri + sec
