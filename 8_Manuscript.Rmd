@@ -148,7 +148,7 @@ To reveal the impacts that cumulative pressures have had on bumble bee occurrenc
 # Set input directory
 inDir <- "3_RunModels/"
 
-# Load required packageexporer 5_ s
+# Load required packages
 suppressMessages(suppressWarnings(library(terra))) # Version 1.7-71
 suppressMessages(suppressWarnings(library(brms))) # Version 2.21.0
 suppressMessages(suppressWarnings(library(Hmisc))) # Version 5.1-1
@@ -976,7 +976,7 @@ print(sessionInfo())
 
 # Data and Code Availability:
 
-The code needed to run all of the analyses is publicly available on ([GitHub](https://github.com/timnewbold/BumblebeesLUClimStudy)). The data needed to run the code are published on FigShare, DOI: ([10.6084/m9.figshare.28631153](http://doi.org/10.6084/m9.figshare.28631153)), except for datasets for which we do not have permission to republish, but which are freely available in other public repositories. Instructions for obtaining these additional datasets are given both in the FigShare repository description, and at the top of the first two code scripts.
+The code needed to run all of the analyses is publicly available on ([GitHub](https://github.com/timnewbold/BumblebeesLUClimStudy)). The data needed to run the code are published on FigShare, DOI: ([10.6084/m9.figshare.28713143](http://doi.org/10.6084/m9.figshare.28713143)), except for datasets for which we do not have permission to republish, but which are freely available in other public repositories. Instructions for obtaining these additional datasets are given both in the FigShare repository description, and at the top of the first two code scripts.
 
 # Acknowledgments
 

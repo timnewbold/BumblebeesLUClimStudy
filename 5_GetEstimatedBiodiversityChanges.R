@@ -83,7 +83,7 @@ clusterExport(cl = cl,list = c("finalModel","nd.bl","nd.obs"))
 
 # Make 1,000 predictions of % difference between observed
 # and baseline conditions
-preds <- parSapply(cl = cl,X = 1:10,FUN = function(i){
+preds <- parSapply(cl = cl,X = 1:1000,FUN = function(i){
   
   # Draw one of the posterior parameter estimates at random
   i <- sample(x = 1:4000,size = 1,replace = FALSE)

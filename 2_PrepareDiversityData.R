@@ -71,7 +71,7 @@ sessionInfo()
 
 cat('Loading database extracts\n')
 # Read the PREDICTS database
-diversity<-readRDS(paste(dataDir,"database_v1.rds",sep=""))
+diversity<-readRDS(paste(dataDir,"database.rds",sep=""))
 
 cat('Selecting appropriate data\n')
 # Remove sites without geographical coordinates
@@ -110,18 +110,10 @@ TEI_bl <- readRDS(paste(dataDir,"BaselineTEI_Spp.rds",sep=""))
 names(TEI_bl) <- paste("Bombus_",sp.names$x,sep="")
 TEI_bl <- rast(TEI_bl)
 crs(TEI_bl) <- wgsCRS
-PEI_bl <- readRDS(paste(dataDir,"BaselinePEI_Spp.rds",sep=""))
-names(PEI_bl) <- paste("Bombus_",sp.names$x,sep="")
-PEI_bl <- rast(PEI_bl)
-crs(PEI_bl) <- wgsCRS
 TEI_delta <- readRDS(paste(dataDir,"DeltaTEI_Spp_Period3.rds",sep=""))
 names(TEI_delta) <- paste("Bombus_",sp.names$x,sep="")
 TEI_delta <- rast(TEI_delta)
 crs(TEI_delta) <- wgsCRS
-PEI_delta <- readRDS(paste(dataDir,"DeltaPEI_Spp_Period3.rds",sep=""))
-names(PEI_delta) <- paste("Bombus_",sp.names$x,sep="")
-PEI_delta <- rast(PEI_delta)
-crs(PEI_delta) <- wgsCRS
 
 ## Check correspondence between measures based on old and new CRU data
 
@@ -171,25 +163,11 @@ diversity <- do.call('rbind',lapply(X = split(
     div.sp$TEI_BL <- NA
   }
   
-  if (sp %in% names(PEI_bl)){
-    div.sp$PEI_BL <- terra::extract(
-      x = PEI_bl[[sp]],y = div.sp[,c('Longitude','Latitude')])[[sp]]
-  } else {
-    div.sp$PEI_BL <- NA
-  }
-  
   if (sp %in% names(TEI_delta)){
     div.sp$TEI_delta <- terra::extract(
       x = TEI_delta[[sp]],y = div.sp[,c('Longitude','Latitude')])[[sp]]
   } else {
     div.sp$TEI_delta <- NA
-  }
-  
-  if (sp %in% names(PEI_delta)){
-    div.sp$PEI_delta <- terra::extract(
-      x = PEI_delta[[sp]],y = div.sp[,c('Longitude','Latitude')])[[sp]]
-  } else {
-    div.sp$PEI_delta <- NA
   }
   
   if (sp2 %in% names(TEI_bl_4)){
@@ -249,13 +227,13 @@ nathab.10 <- terra::project(x = nathab.10,y = wgsCRS)
 
 # Extract values to the biodiversity data frame
 diversity$NaturalHabitat1k <- terra::extract(
-  x = nathab.1,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
+  x = nathab.1,y = diversity[,c('Longitude','Latitude')])$PRI_1km_2005_0ice
 diversity$NaturalHabitat2k <- terra::extract(
-  x = nathab.2,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
+  x = nathab.2,y = diversity[,c('Longitude','Latitude')])$PRI_1km_2005_0ice
 diversity$NaturalHabitat5k <- terra::extract(
-  x = nathab.5,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
+  x = nathab.5,y = diversity[,c('Longitude','Latitude')])$PRI_1km_2005_0ice
 diversity$NaturalHabitat10k <- terra::extract(
-  x = nathab.10,y = diversity[,c('Longitude','Latitude')])$pri_1km_int
+  x = nathab.10,y = diversity[,c('Longitude','Latitude')])$PRI_1km_2005_0ice
 
 # Read estimates of pesticide toxicity and add to data frame
 pest.tox.l <- rast(paste0(mapDir,"Pesticide_TotalToxicity_Low.tif"))
@@ -349,4 +327,4 @@ t.end <- Sys.time()
 
 print(round(t.end - t.start,0))
 
-# sink()
+sink()
